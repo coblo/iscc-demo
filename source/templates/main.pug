@@ -1,0 +1,56 @@
+html
+
+	head
+		meta(charset="UTF-8")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		meta(http-equiv="X-UA-Compatible", content="ie=edge")
+		title ISCC Demo
+		link(rel="stylesheet", href="/css/style.css")
+		script(src="/socket.io/socket.io.js")
+		script(src="/libraries/functions.js")
+		script(src="//cdn.ckeditor.com/4.7.1/full/ckeditor.js")
+
+	body
+
+		section#result
+
+			.heading ISCC
+
+			.id#metaID MetaID
+				.value xxxxxxxxxxxxxxx
+
+			.id#contentID ContentID-Text
+				.value xxxxxxxxxxxxxxx
+
+			.id#dataID DataID
+				.value xxxxxxxxxxxxxxx
+
+			.id#instanceID InstanceID
+				.value xxxxxxxxxxxxxxx
+
+			#loadingBar
+				.bar
+
+		section#bom
+
+			.heading Basic On-Chain Metadata (BOM)
+
+			.title
+				span Title
+				input(type="text", name="title", value="Harry Potter and the Philosopher’s Stone", required)
+
+			.creators
+				span Creators
+
+				button#addCreator
+
+		section#text
+
+			.heading Texteditor
+
+			textarea(required).
+			
+				The success of the books and films has ensured that the Harry Peterson franchise continues to expand, with numerous derivative works, a travelling exhibition that premiered in Chicago in 2015, a studio tour in Berlin that opened in 2016, a digital platform on which Peter Meyers updates with numerous derivative works, a travelling exhibition that premiered in Amsterdam in 2013, a studio tour in London that
+
+		script
+			include ../scripts/main.js
