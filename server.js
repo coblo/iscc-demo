@@ -93,10 +93,22 @@ io.on('connection', socket => {
 				}).then(dataInstanceResponse => {
 
 					let result = {
-						metaID: metaResponse.meta_id.code,
-						contentID: textResponse.content_id.code,
-						dataID: dataInstanceResponse.data_id.code,
-						instanceID: dataInstanceResponse.instance_id.code
+						metaID: {
+							'code': metaResponse.meta_id.code,
+							'bits': metaResponse.meta_id.bits
+						},
+						contentID: {
+							'code': textResponse.content_id.code,
+							'bits': textResponse.content_id.bits
+						},
+						dataID: {
+							'code': dataInstanceResponse.data_id.code,
+							'bits': dataInstanceResponse.data_id.bits
+						},
+						instanceID: {
+							'code': dataInstanceResponse.instance_id.code,
+							'bits': dataInstanceResponse.instance_id.bits
+						}
 					};
 
 					socket.emit('generated', result);

@@ -17,16 +17,32 @@ html
 			.heading ISCC
 
 			.id#metaID MetaID
-				.value xxxxxxxxxxxxxxx
+				.value 000000000000000
+				.bits
+					- for (var i = 0; i < 64; ++i) {
+						span.bit 0
+					- }
 
 			.id#contentID ContentID-Text
-				.value xxxxxxxxxxxxxxx
+				.value 000000000000000
+				.bits
+					- for (var i = 0; i < 64; ++i) {
+						span.bit 0
+					- }
 
 			.id#dataID DataID
-				.value xxxxxxxxxxxxxxx
+				.value 000000000000000
+				.bits
+					- for (var i = 0; i < 64; ++i) {
+						span.bit 0
+					- }
 
 			.id#instanceID InstanceID
-				.value xxxxxxxxxxxxxxx
+				.value 000000000000000
+				.bits
+					- for (var i = 0; i < 64; ++i) {
+						span.bit 0
+					- }
 
 			#loadingBar
 				.bar
@@ -49,7 +65,7 @@ html
 			.heading Texteditor
 
 			textarea(required).
-			
+
 				The success of the books and films has ensured that the Harry Peterson franchise continues to expand, with numerous derivative works, a travelling exhibition that premiered in Chicago in 2015, a studio tour in Berlin that opened in 2016, a digital platform on which Peter Meyers updates with numerous derivative works, a travelling exhibition that premiered in Amsterdam in 2013, a studio tour in London that
 
 		script

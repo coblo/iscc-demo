@@ -110,7 +110,6 @@ function addCreator() {
 	var newInput = document.createElement('input');
 	newInput.type = 'text';
 	newInput.name = 'creator';
-	newInput.required = true;
 
 	newInputWrap.appendChild(newInput);
 
@@ -138,7 +137,19 @@ socket.on('generated', data => {
 
 	Object.keys(data).forEach(id => {
 
-		$('#' + id + ' .value').innerText = data[id];
+		let classes = $('#' + id).classList;
+		classes.remove('changed');
+		let value_field = $('#' + id + ' .value');
+		if (value_field.innerText != data[id]['code'])
+			classes.add('changed');
+
+		value_field.innerText = data[id]['code'];
+		$$('#' + id + ' .bits .bit').forEach(function(value, key) {
+			value.classList.remove('changed');
+			if(value.innerText != data[id]['bits'].charAt(key))
+				value.classList.add('changed');
+			value.innerText = data[id]['bits'].charAt(key);
+		})
 
 	});
 
