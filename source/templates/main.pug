@@ -16,36 +16,12 @@ html
 
 			.heading ISCC
 
-			.id#metaID MetaID
-				.value 000000000000000
-				.bits
-					- for (var i = 0; i < 64; ++i) {
-						span.bit 0
-					- }
-
-			.id#contentID ContentID-Text
-				.value 000000000000000
-				.bits
-					- for (var i = 0; i < 64; ++i) {
-						span.bit 0
-					- }
-
-			.id#dataID DataID
-				.value 000000000000000
-				.bits
-					- for (var i = 0; i < 64; ++i) {
-						span.bit 0
-					- }
-
-			.id#instanceID InstanceID
-				.value 000000000000000
-				.bits
-					- for (var i = 0; i < 64; ++i) {
-						span.bit 0
-					- }
-
-			#loadingBar
-				.bar
+			each id in ['metaID', 'contentID', 'dataID', 'instanceID']
+				.id(id= id)= id
+					.value 000000000000000
+					.bits
+						each bit in new Array(64)
+							span 0
 
 		section#bom
 
@@ -53,7 +29,7 @@ html
 
 			.title
 				span Title
-				input(type="text", name="title", required)
+				input(type="text", name="title")
 
 			.creators
 				span Creators
@@ -64,11 +40,14 @@ html
 
 			.heading Texteditor
 
-			textarea(required).
+			textarea
 
-		section#generate
+		button#generate
 
-			button(type=button) Generate ISCC
+			span Generate ISCC
+			
+			#loadingBar
+				.bar
 
 		section#log
 

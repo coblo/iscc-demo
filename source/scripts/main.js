@@ -6,6 +6,7 @@ var $creators = $('#bom .creators');
 var $addCreator = $('#addCreator');
 var $loadingBar = $('#loadingBar');
 var $textarea = $('#text textarea');
+var $generate = $('#generate');
 
 var texteditor = CKEDITOR.replace($textarea, {
 	toolbar: [{
@@ -33,58 +34,54 @@ $addCreator.addEventListener('click', e => {
 
 });
 
+$generate.addEventListener('click', () => {
 
-function sendData() {
+	$loadingBar.classList.add('loading');
+	$generate.disabled = true;
 
-	var $$invalids = $$('[required]:invalid');
+	$$('.title input, .creators input').forEach($element => {
 
-	if ($$invalids.length) {
+		$element.addEventListener('input', () => {
 
-		$$invalids.forEach(input => {
+			$generate.disabled = false;
 
-			input.classList.add('error');
+		}, {
+			once: true
+		})
 
-			input.addEventListener('keydown', () => {
+	});
 
-				input.classList.remove('error');
+	texteditor.on('change', () => {
 
-			}, {
-				once: true
-			});
+		$generate.disabled = false;
 
-		});
+	}, {
+		once: true
+	});
 
-	} else {
+	let html = texteditor.getData();
 
-		$loadingBar.classList.add('loading');
+	let tmp = document.createElement('div');
+	tmp.innerHTML = html;
 
-		let html = texteditor.getData();
+	let text = tmp.innerText;
 
-		let tmp = document.createElement('div');
-		tmp.innerHTML = html;
+	var data = {
+		title: $('input[name="title"]').value,
+		creators: $$('input[name="creator"]').map(input => {
+			return input.value
+		}).join(';'),
+		html: html,
+		text: text
+	};
 
-		let text = tmp.innerText;
+	socket.emit('generate', data);
 
-		var data = {
-			title: $('input[name="title"]').value,
-			creators: $$('input[name="creator"]').map(input => {
-				return input.value
-			}).join(';'),
-			html: html,
-			text: text
-		};
-
-		socket.emit('generate', data);
-
-	}
-
-}
-
-
-let generateButton = $('#generate button');
-generateButton.addEventListener('click', () => { sendData(); });
+});
 
 function addCreator() {
+
+	$generate.disabled = false;
 
 	var newInputWrap = document.createElement('div');
 	newInputWrap.classList.add('creator');
@@ -112,16 +109,23 @@ socket.on('generated', data => {
 
 		let classes = $('#' + id).classList;
 		classes.remove('changed');
+
 		let value_field = $('#' + id + ' .value');
+
 		if (value_field.innerText != data[id]['code'])
 			classes.add('changed');
 
 		value_field.innerText = data[id]['code'];
-		$$('#' + id + ' .bits .bit').forEach(function(value, key) {
+
+		$$('#' + id + ' .bits .bit').forEach(function (value, key) {
+
 			value.classList.remove('changed');
-			if(value.innerText != data[id]['bits'].charAt(key))
+
+			if (value.innerText != data[id]['bits'].charAt(key))
 				value.classList.add('changed');
+
 			value.innerText = data[id]['bits'].charAt(key);
+
 		})
 
 	});
@@ -131,7 +135,10 @@ socket.on('generated', data => {
 });
 
 socket.on('logchanged', html => {
+
 	let temp = document.createElement('div');
 	temp.innerHTML = html;
-	$('#log .log-entries').appendChild(temp.firstChild)
+
+	$('#log .log-entries').appendChild(temp.firstChild);
+
 });

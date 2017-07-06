@@ -134,7 +134,7 @@ section
 	display: flex
 	flex-flow: row wrap
 	align-content: flex-start
-	padding: 0 .5rem
+	padding: .5rem
 
 	.heading
 		padding: 1rem 1rem 0 1rem
@@ -142,7 +142,8 @@ section
 	.id
 		flex: 1
 		text-align: center
-		padding: 0 .5rem
+		padding: .5rem
+		text-transform: capitalize
 
 		&.changed
 			color: #ff9800
@@ -168,8 +169,6 @@ section
 	height: .2rem
 	position: relative
 	overflow: hidden
-	background-color: #ddd
-	margin: 1rem -.5rem 0 -.5rem
 
 	&.loading
 		.bar
@@ -186,12 +185,17 @@ section
 
 #generate
 	flex-basis: 100%
-	background-color: inherit
+	font-size: 1.2rem
+	margin: .5rem
 
-	button
-		padding: .5rem
-		float: right
-		font-size: 1.2rem
+	&:disabled
+		cursor: default
+		background: #eaeaea
+		color: #ccc
+
+	span
+		display: block
+		margin: .8rem 0 .6rem 0
 
 #log
 	flex-basis: 100%
@@ -199,16 +203,19 @@ section
 	.log-entries
 		display: flex
 		flex-direction: column-reverse
+
 		.log-entry
 			display: flex
 			flex-flow: row wrap
 			margin-top: 1rem
 			padding: 1rem
 			background-color: #fff
+
 			.iscc
 				flex-basis: 100%
 				font-size: 1.1rem
 				margin-bottom: .5rem
+
 			.bits
 				flex-basis: 50%
 				font-family: "roboto mono", monospace
@@ -216,6 +223,7 @@ section
 				.bit
 					background-color: #1EB025
 					color: rgba(255, 255, 255, 0.5)
+
 					&.diff
 						background-color: #FF0000
 				.mid, .cid, .did, .iid
@@ -230,16 +238,21 @@ section
 			.data
 				flex-basis: 50%
 				flex-direction: column
+
 				.text input
 						display: none
-						~.short
+
+						~ .short
 							display: block
-						~.long
+
+						~ .long
 							display: none
+
 						&:checked
-							~.short
+
+							~ .short
 								display: none
-							~.long
+							~ .long
 								display: block
 
 @keyframes loading {
