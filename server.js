@@ -53,6 +53,8 @@ const server = https.createServer({
 
 const io = require('socket.io')(server);
 
+let logEntries = [];
+
 server.listen(config.port, () => {
 
 	console.log('ISCC Demo running on port ' + config.port);
@@ -92,25 +94,43 @@ io.on('connection', socket => {
 					json: true
 				}).then(dataInstanceResponse => {
 
+					let lastBits = false;
+					if (logEntries.length > 0)
+						lastBits = logEntries[logEntries.length - 1].iscc;
 					let result = {
 						metaID: {
 							'code': metaResponse.meta_id.code,
-							'bits': metaResponse.meta_id.bits
+							'bits': metaResponse.meta_id.bits,
+							'diff': diffArray(metaResponse.meta_id.bits, lastBits ? lastBits.metaID.bits : metaResponse.meta_id.bits)
 						},
 						contentID: {
 							'code': textResponse.content_id.code,
-							'bits': textResponse.content_id.bits
+							'bits': textResponse.content_id.bits,
+							'diff': diffArray(textResponse.content_id.bits, lastBits ? lastBits.contentID.bits: textResponse.content_id.bits)
 						},
 						dataID: {
 							'code': dataInstanceResponse.data_id.code,
-							'bits': dataInstanceResponse.data_id.bits
+							'bits': dataInstanceResponse.data_id.bits,
+							'diff': diffArray(dataInstanceResponse.data_id.bits, lastBits ? lastBits.dataID.bits : dataInstanceResponse.data_id.bits)
 						},
 						instanceID: {
 							'code': dataInstanceResponse.instance_id.code,
-							'bits': dataInstanceResponse.instance_id.bits
+							'bits': dataInstanceResponse.instance_id.bits,
+							'diff': diffArray(dataInstanceResponse.instance_id.bits, lastBits ? lastBits.instanceID.bits : dataInstanceResponse.instance_id.bits)
 						}
 					};
 
+					let entry = {
+						iscc: result,
+						title: data.title,
+						creator: data.creators,
+						text: data.html
+					};
+					logEntries.push(entry);
+
+					let html = pug.renderFile('source/templates/logentry.pug', {entry: entry});
+
+					socket.emit('logchanged', html);
 					socket.emit('generated', result);
 
 				}).catch(error => {
@@ -129,9 +149,17 @@ io.on('connection', socket => {
 
 app.get('/', function (req, res) {
 
-	renderPage(res, 'main');
+	renderPage(res, 'main', {logEntries: logEntries});
 
 });
+
+function diffArray(arr1, arr2) {
+	let diff = [];
+	for (let i = 0; i < arr1.length; ++i) {
+		diff.push(arr1[i] == arr2[i]);
+	}
+	return diff;
+}
 
 function renderStylus() {
 

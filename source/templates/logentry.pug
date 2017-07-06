@@ -1,0 +1,39 @@
+.log-entry
+	.iscc= entry.iscc.metaID.code + '-' + entry.iscc.contentID.code + '-' + entry.iscc.dataID.code + '-' + entry.iscc.instanceID.code
+	.bits
+		.mid
+			-for (i=0; i<entry.iscc.metaID.bits.length; ++i) {
+				if entry.iscc.metaID.diff[i]
+					span.bit= entry.iscc.metaID.bits[i]
+				else
+					span.bit.diff= entry.iscc.metaID.bits[i]
+			- }
+		.cid
+			-for (i=0; i<entry.iscc.contentID.bits.length; ++i) {
+				if entry.iscc.contentID.diff[i]
+					span.bit= entry.iscc.contentID.bits[i]
+				else
+					span.bit.diff= entry.iscc.contentID.bits[i]
+			- }
+		.did
+			-for (i=0; i<entry.iscc.dataID.bits.length; ++i) {
+				if entry.iscc.dataID.diff[i]
+					span.bit= entry.iscc.dataID.bits[i]
+				else
+					span.bit.diff= entry.iscc.dataID.bits[i]
+			- }
+		.iid
+			-for (i=0; i<entry.iscc.instanceID.bits.length; ++i) {
+				if entry.iscc.instanceID.diff[i]
+					span.bit= entry.iscc.instanceID.bits[i]
+				else
+					span.bit.diff= entry.iscc.metaID.bits[i]
+			- }
+	.data
+		.title= 'Title: ' + entry.title
+		if entry.creator
+			.creator= 'Creators: ' + entry.creator
+		label.text
+			input(type="checkbox")
+			.short!= entry.text.substring(0, 100)  + (entry.text.length > 100 ? '...' : '')
+			.long!= entry.text

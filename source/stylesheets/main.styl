@@ -12,7 +12,7 @@ h1,h2,h3,h4,h5,h6
 p
 	padding: .5rem 0
 
-ul
+ul, ol
 	padding: .5rem 0 .5rem 1.2rem
 
 hr
@@ -180,6 +180,54 @@ section
 		content: ""
 		height: .2rem
 		background-color: #008be8
+
+#generate
+	flex-basis: 100%
+	background-color: inherit
+
+	button
+		padding: .5rem
+		float: right
+		font-size: 1.2rem
+
+#log
+	flex-basis: 100%
+
+	.log-entries
+		display: flex
+		flex-direction: column-reverse
+		.log-entry
+			display: flex
+			flex-flow: row wrap
+			margin-top: 1rem
+			padding: 1rem
+			background-color: #fff
+			.iscc
+				flex-basis: 100%
+				font-size: 1.2rem
+				margin-bottom: .5rem
+			.bits
+				flex-basis: 50%
+				font-family: "roboto mono", monospace
+				.bit
+					background-color: #1EB025
+					color: rgba(255, 255, 255, 0.5)
+					&.diff
+						background-color: #FF0000
+			.data
+				flex-basis: 50%
+				flex-direction: column
+				.text input
+						display: none
+						~.short
+							display: block
+						~.long
+							display: none
+						&:checked
+							~.short
+								display: none
+							~.long
+								display: block
 
 @keyframes loading {
 	from { left: -50%; width: 25%; }

@@ -27,37 +27,14 @@ var texteditor = CKEDITOR.replace($textarea, {
 	]
 });
 
-texteditor.on('change', function () {
-
-	clearTimeout(sendTimeout);
-
-	sendTimeout = setTimeout(sendData, 1000);
-
-})
-
-addCreator();
-
 $addCreator.addEventListener('click', e => {
 
 	addCreator();
 
 });
 
-var sendTimeout;
 
-$$('[required]').forEach(input => {
-
-	input.addEventListener('keydown', () => {
-
-		clearTimeout(sendTimeout);
-
-		sendTimeout = setTimeout(sendData, 1000);
-
-	});
-
-});
-
-function sendData(filename) {
+function sendData() {
 
 	var $$invalids = $$('[required]:invalid');
 
@@ -103,6 +80,10 @@ function sendData(filename) {
 
 }
 
+
+let generateButton = $('#generate button');
+generateButton.addEventListener('click', () => { sendData(); });
+
 function addCreator() {
 
 	var newInputWrap = document.createElement('div');
@@ -118,14 +99,6 @@ function addCreator() {
 		if (e.target.offsetWidth - e.offsetX < 25) {
 			newInputWrap.remove();
 		}
-
-	});
-
-	newInput.addEventListener('keydown', () => {
-
-		clearTimeout(sendTimeout);
-
-		sendTimeout = setTimeout(sendData, 1000);
 
 	});
 
@@ -155,4 +128,10 @@ socket.on('generated', data => {
 
 	$loadingBar.classList.remove('loading');
 
+});
+
+socket.on('logchanged', html => {
+	let temp = document.createElement('div');
+	temp.innerHTML = html;
+	$('#log .log-entries').appendChild(temp.firstChild)
 });

@@ -53,7 +53,7 @@ html
 
 			.title
 				span Title
-				input(type="text", name="title", value="Harry Potter and the Philosopher’s Stone", required)
+				input(type="text", name="title", required)
 
 			.creators
 				span Creators
@@ -66,7 +66,17 @@ html
 
 			textarea(required).
 
-				The success of the books and films has ensured that the Harry Peterson franchise continues to expand, with numerous derivative works, a travelling exhibition that premiered in Chicago in 2015, a studio tour in Berlin that opened in 2016, a digital platform on which Peter Meyers updates with numerous derivative works, a travelling exhibition that premiered in Amsterdam in 2013, a studio tour in London that
+		section#generate
+
+			button(type=button) Generate ISCC
+
+		section#log
+
+			.heading Log
+
+			.log-entries
+				each entry in logEntries
+					include logentry
 
 		script
 			include ../scripts/main.js
