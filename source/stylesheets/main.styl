@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto')
+
 *
 	box-sizing: border-box
 	vertical-align: top
@@ -5,6 +7,7 @@
 	padding: 0
 	border: none
 	color: inherit
+	font-family: roboto
 
 h1,h2,h3,h4,h5,h6
 	padding: .2rem 0 .5rem 0
@@ -204,16 +207,26 @@ section
 			background-color: #fff
 			.iscc
 				flex-basis: 100%
-				font-size: 1.2rem
+				font-size: 1.1rem
 				margin-bottom: .5rem
 			.bits
 				flex-basis: 50%
 				font-family: "roboto mono", monospace
+				cursor: default
 				.bit
 					background-color: #1EB025
 					color: rgba(255, 255, 255, 0.5)
 					&.diff
 						background-color: #FF0000
+				.mid, .cid, .did, .iid
+					&:hover
+						.bit
+							opacity: 0.5
+						&:before
+							content: 'Jaccard-Similarity: ' attr(data-sim) '%'
+							position: absolute
+							color: #000
+							font-weight: bold
 			.data
 				flex-basis: 50%
 				flex-direction: column
