@@ -23,31 +23,31 @@ html
 						each bit in new Array(64)
 							span 0
 
-		section#bom
+		#loadingBar
+			.bar
 
-			.heading Basic On-Chain Metadata (BOM)
+		#generate
+			button.generate-button(type=button) Generate ISCC
 
-			.title
-				span Title
-				input(type="text", name="title")
+		section#input-data
 
-			.creators
-				span Creators
+			#bom
+				.heading Basic On-Chain Metadata (BOM)
 
-				button#addCreator
+				.title
+					span Title
+					input(type="text", name="title")
 
-		section#text
+				.creators
+					span Creators
 
-			.heading Texteditor
+					button#addCreator
 
-			textarea
+			#text
 
-		button#generate
+				.heading Texteditor
 
-			span Generate ISCC
-			
-			#loadingBar
-				.bar
+				textarea
 
 		section#log
 

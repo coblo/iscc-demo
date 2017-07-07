@@ -120,6 +120,7 @@ section
 #text
 	display: flex
 	flex-direction: column
+	margin-top: 2rem
 
 	.heading
 		flex: none
@@ -185,24 +186,25 @@ section
 
 #generate
 	flex-basis: 100%
-	font-size: 1.2rem
 	margin: .5rem
 
-	&:disabled
-		cursor: default
-		background: #eaeaea
-		color: #ccc
+	.generate-button
+		background-color: #cc0000
+		color: #fff
+		float: right
+		padding: .5rem
+		font-size: 1.3rem
 
-	span
-		display: block
-		margin: .8rem 0 .6rem 0
+		&:disabled
+			cursor: default
+			background: #eaeaea
+			color: #ccc
 
 #log
-	flex-basis: 100%
-
 	.log-entries
 		display: flex
 		flex-direction: column-reverse
+		overflow: auto
 
 		.log-entry
 			display: flex
