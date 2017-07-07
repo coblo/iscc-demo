@@ -1,35 +1,38 @@
 .log-entry
+	input(id='entry-' + key, type='checkbox')
+	label.flip(for='entry-' + key)
 	.iscc= entry.time + ' - ' + 'ISCC: ' + entry.iscc.metaID.code + '-' + entry.iscc.contentID.code + '-' + entry.iscc.dataID.code + '-' + entry.iscc.instanceID.code
-	.bits
-		.mid(data-sim=entry.iscc.metaID.sim)
-			-for (i=0; i<entry.iscc.metaID.bits.length; ++i) {
-				if entry.iscc.metaID.diff[i]
-					span.bit= entry.iscc.metaID.bits[i]
-				else
-					span.bit.diff= entry.iscc.metaID.bits[i]
-			- }
-		.cid(data-sim=entry.iscc.contentID.sim)
-			-for (i=0; i<entry.iscc.contentID.bits.length; ++i) {
-				if entry.iscc.contentID.diff[i]
-					span.bit= entry.iscc.contentID.bits[i]
-				else
-					span.bit.diff= entry.iscc.contentID.bits[i]
-			- }
-		.did(data-sim=entry.iscc.dataID.sim)
-			-for (i=0; i<entry.iscc.dataID.bits.length; ++i) {
-				if entry.iscc.dataID.diff[i]
-					span.bit= entry.iscc.dataID.bits[i]
-				else
-					span.bit.diff= entry.iscc.dataID.bits[i]
-			- }
-		.iid(data-sim=entry.iscc.instanceID.sim)
-			-for (i=0; i<entry.iscc.instanceID.bits.length; ++i) {
-				if entry.iscc.instanceID.diff[i]
-					span.bit= entry.iscc.instanceID.bits[i]
-				else
-					span.bit.diff= entry.iscc.metaID.bits[i]
-			- }
-	.data
+	.front
+		.bits
+			.mid(data-sim=entry.iscc.metaID.sim)
+				-for (i=0; i<entry.iscc.metaID.bits.length; ++i) {
+					if entry.iscc.metaID.diff[i]
+						span.bit= entry.iscc.metaID.bits[i]
+					else
+						span.bit.diff= entry.iscc.metaID.bits[i]
+				- }
+			.cid(data-sim=entry.iscc.contentID.sim)
+				-for (i=0; i<entry.iscc.contentID.bits.length; ++i) {
+					if entry.iscc.contentID.diff[i]
+						span.bit= entry.iscc.contentID.bits[i]
+					else
+						span.bit.diff= entry.iscc.contentID.bits[i]
+				- }
+			.did(data-sim=entry.iscc.dataID.sim)
+				-for (i=0; i<entry.iscc.dataID.bits.length; ++i) {
+					if entry.iscc.dataID.diff[i]
+						span.bit= entry.iscc.dataID.bits[i]
+					else
+						span.bit.diff= entry.iscc.dataID.bits[i]
+				- }
+			.iid(data-sim=entry.iscc.instanceID.sim)
+				-for (i=0; i<entry.iscc.instanceID.bits.length; ++i) {
+					if entry.iscc.instanceID.diff[i]
+						span.bit= entry.iscc.instanceID.bits[i]
+					else
+						span.bit.diff= entry.iscc.metaID.bits[i]
+				- }
+	.back
 		.title= 'Title: ' + entry.title
 		if entry.creator
 			.creator= 'Creators: ' + entry.creator

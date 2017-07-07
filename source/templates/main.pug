@@ -19,9 +19,6 @@ html
 			each id in ['metaID', 'contentID', 'dataID', 'instanceID']
 				.id(id= id)= id
 					.value 000000000000000
-					.bits
-						each bit in new Array(64)
-							span 0
 
 		#loadingBar
 			.bar
@@ -54,7 +51,7 @@ html
 			.heading Log
 
 			.log-entries
-				each entry in logEntries
+				each entry, key in logEntries
 					include logentry
 
 		script

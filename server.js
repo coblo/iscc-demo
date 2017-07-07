@@ -167,6 +167,7 @@ io.on('connection', socket => {
 					logEntries.push(entry);
 
 					let html = pug.renderFile('source/templates/logentry.pug', {
+						key: logEntries.length - 2,
 						entry: entry
 					});
 
