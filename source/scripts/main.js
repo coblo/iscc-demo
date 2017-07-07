@@ -6,7 +6,7 @@ var $creators = $('#bom .creators');
 var $addCreator = $('#addCreator');
 var $loadingBar = $('#loadingBar');
 var $textarea = $('#text textarea');
-var $generate = $('#generate');
+var $generate = $('#generate .generate-button');
 
 var texteditor = CKEDITOR.replace($textarea, {
 	toolbar: [{

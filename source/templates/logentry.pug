@@ -4,6 +4,7 @@
 	.iscc= entry.time + ' - ' + 'ISCC: ' + entry.iscc.metaID.code + '-' + entry.iscc.contentID.code + '-' + entry.iscc.dataID.code + '-' + entry.iscc.instanceID.code
 	.front
 		.bits
+			.m= entry.iscc.metaID.code + ': '
 			.mid(data-sim=entry.iscc.metaID.sim)
 				-for (i=0; i<entry.iscc.metaID.bits.length; ++i) {
 					if entry.iscc.metaID.diff[i]
@@ -11,6 +12,7 @@
 					else
 						span.bit.diff= entry.iscc.metaID.bits[i]
 				- }
+			.c= entry.iscc.contentID.code + ': '
 			.cid(data-sim=entry.iscc.contentID.sim)
 				-for (i=0; i<entry.iscc.contentID.bits.length; ++i) {
 					if entry.iscc.contentID.diff[i]
@@ -18,6 +20,7 @@
 					else
 						span.bit.diff= entry.iscc.contentID.bits[i]
 				- }
+			.d= entry.iscc.dataID.code + ': '
 			.did(data-sim=entry.iscc.dataID.sim)
 				-for (i=0; i<entry.iscc.dataID.bits.length; ++i) {
 					if entry.iscc.dataID.diff[i]
@@ -25,6 +28,7 @@
 					else
 						span.bit.diff= entry.iscc.dataID.bits[i]
 				- }
+			.i= entry.iscc.instanceID.code + ': '
 			.iid(data-sim=entry.iscc.instanceID.sim)
 				-for (i=0; i<entry.iscc.instanceID.bits.length; ++i) {
 					if entry.iscc.instanceID.diff[i]
