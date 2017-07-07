@@ -67,7 +67,7 @@ io.on('connection', socket => {
 
 		request.post({
 			method: 'POST',
-			uri: 'http://127.0.0.1:8000/generate/meta_id',
+			uri: config.apiAddress + '/generate/meta_id',
 			form: {
 				title: data.title || ' ',
 				creators: data.creators || ' '
@@ -77,7 +77,7 @@ io.on('connection', socket => {
 
 			request.post({
 				method: 'POST',
-				uri: 'http://127.0.0.1:8000/generate/content_id_text',
+				uri: config.apiAddress + '/generate/content_id_text',
 				form: {
 					text: data.text || ' '
 				},
@@ -86,7 +86,7 @@ io.on('connection', socket => {
 
 				request.post({
 					method: 'POST',
-					uri: 'http://127.0.0.1:8000/generate/data_instance_id',
+					uri: config.apiAddress + '/generate/data_instance_id',
 					body: data.html || ' ',
 					headers: {
 						'Content-Type': 'application/octet-stream'

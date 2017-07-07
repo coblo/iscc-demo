@@ -1,5 +1,6 @@
 module.exports = Object.assign( /* require('./config.default.js') , */ {
 	port: 5555,
+	apiAddress: "http://127.0.0.1:8000",
 	sslKeyPath: "ssl/demo-key.pem",
 	sslCertificatePath: "ssl/demo-crt.pem",
 	sslCaPath: "ssl/demo-ca-crt.crt",
