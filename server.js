@@ -97,14 +97,13 @@ io.on('connection', socket => {
 
 					let differences;
 
-					if (logEntries.length > 0) {
+					if (data.lastBits) {
 
-						let lastBits = logEntries[logEntries.length - 1].iscc;
 						differences = {
-							meta_id: diffArray(metaResponse.meta_id.bits, lastBits.metaID.bits),
-							content_id: diffArray(textResponse.content_id.bits, lastBits.contentID.bits),
-							data_id: diffArray(dataInstanceResponse.data_id.bits, lastBits.dataID.bits),
-							instance_id: diffArray(dataInstanceResponse.instance_id.bits, lastBits.instanceID.bits)
+							meta_id: diffArray(metaResponse.meta_id.bits, data.lastBits.metaID.bits),
+							content_id: diffArray(textResponse.content_id.bits, data.lastBits.contentID.bits),
+							data_id: diffArray(dataInstanceResponse.data_id.bits, data.lastBits.dataID.bits),
+							instance_id: diffArray(dataInstanceResponse.instance_id.bits, data.lastBits.instanceID.bits)
 						};
 
 					} else {
@@ -125,7 +124,7 @@ io.on('connection', socket => {
 						instance_id: jaccard_sim(differences.instance_id)
 					};
 
-					let result = {
+					let iscc = {
 						metaID: {
 							'code': metaResponse.meta_id.code,
 							'bits': metaResponse.meta_id.bits,
@@ -157,23 +156,18 @@ io.on('connection', socket => {
 					let timeStamp = d.getFullYear() + '-' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1) + '-' +
 						(d.getDate() < 10 ? '0' : '') + d.getDate() + ' ' + d.toTimeString().substring(0, 8);
 
-					let entry = {
+					let logEntry = {
 						time: timeStamp,
-						iscc: result,
+						iscc: iscc,
 						title: data.title,
 						creator: data.creators,
 						text: data.html
 					};
 
-					logEntries.push(entry);
-
-					let html = pug.renderFile('source/templates/logentry.pug', {
-						key: logEntries.length - 1,
-						entry: entry
+					socket.emit('generated', {
+						ids: iscc,
+						log: logEntry
 					});
-
-					socket.emit('logchanged', html);
-					socket.emit('generated', result);
 
 				}).catch(error => {
 

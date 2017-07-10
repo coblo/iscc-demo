@@ -23,9 +23,6 @@ html
 		#loadingBar
 			.bar
 
-		#generate
-			button.generate-button(type=button) Generate ISCC
-
 		section#input-data
 
 			#bom
@@ -46,13 +43,19 @@ html
 
 				textarea
 
+		#generate
+			button.generate-button(type=button) Generate ISCC
+
 		section#log
 
 			.heading Log
 
-			.log-entries
+			.logEntries
 				each entry, key in logEntries
 					include logentry
+
+		script(type="text/template")#logEntryTemplate
+			include logentry
 
 		script
 			include ../scripts/main.js

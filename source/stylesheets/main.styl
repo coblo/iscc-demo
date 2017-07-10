@@ -27,9 +27,6 @@ button
 	background: #ccc
 
 body
-	display: flex
-	flex-flow: row wrap
-	align-content: flex-start
 	font-family: 'Helvetica Neue', sans-serif
 	font-size: 16px
 	padding: .5rem
@@ -46,7 +43,6 @@ body
 	cursor: move
 
 section
-	flex: 1
 	padding: 1rem
 	margin: .5rem
 	background-color: #eee
@@ -186,12 +182,12 @@ section
 
 #generate
 	flex-basis: 100%
-	margin: .5rem
+	margin: 1rem
+	text-align: center
 
 	.generate-button
 		background-color: #cc0000
 		color: #fff
-		float: right
 		padding: .5rem
 		font-size: 1.3rem
 
@@ -201,12 +197,13 @@ section
 			color: #ccc
 
 #log
-	.log-entries
+
+	.logEntries
 		display: flex
 		flex-direction: column-reverse
 		overflow: auto
 
-		.log-entry
+		.logEntry
 			display: flex
 			flex-flow: row wrap
 			margin-top: 1rem
@@ -214,10 +211,13 @@ section
 			background-color: #fff
 			position: relative
 
+			.date,
 			.iscc
 				flex-basis: 100%
-				font-size: 1.1rem
 				margin-bottom: .5rem
+
+			.date
+				font-size: .7rem
 
 			.flip
 				position: absolute
@@ -228,6 +228,7 @@ section
 				width: 1.5rem
 				height: 1.5rem
 				font-weight: bold
+
 				&:before
 					left: .5rem
 					top: .08rem
@@ -238,40 +239,75 @@ section
 				display: none
 
 				&:checked
+
 					~ .flip
+
 						&:before
 							left: .39rem
 							top: -.05rem
 							content: 'x'
+
 					~ .front
 						display: none
+
 					~ .back
 						display: block
 
+			.front,
+			.back
+				width: 100%
+				height: 5.5rem
+
 			.front
-				display: block
+
+				.row
+					display: flex
+					justify-content: center
+					align-items: center
+
+					&:not(:last-of-type)
+						margin-bottom: .5rem
+
+				.label
+					width: 7rem
+					font-size: .7rem
+					text-align: right
+					padding-right: .5rem
+
 				.bits
-					font-family: "roboto mono", monospace
+					position: relative
 					cursor: default
-					.bit
+
+					&:hover
+						&:before
+							opacity: 1
+
+					span
 						background-color: #1EB025
 						color: rgba(255, 255, 255, 0.5)
+						font-family: "roboto mono", monospace
+						font-size: .8rem
+						padding: 2px 0
 
 						&.diff
 							background-color: #FF0000
-					.m, .c, .d, .i
-						width: 10rem
-						display: inline-block
-					.mid, .cid, .did, .iid
-						display: inline-block
-						&:hover
-							.bit
-								opacity: 0.5
-							&:before
-								content: 'Jaccard-Similarity: ' attr(data-sim) '%'
-								position: absolute
-								color: #000
-								font-weight: bold
+					
+					&:before
+						content: 'Jaccard-Similarity: ' attr(data-sim) '%'
+						position: absolute
+						left: 0
+						top: -2px
+						bottom: -2px
+						width: 100%
+						color: #000
+						background-color: rgba(255,255,255,.5)
+						font-weight: bold
+						text-align: center
+						text-transform: uppercase
+						font-size: .8rem
+						line-height: 1.2rem
+						opacity: 0
+
 			.back
 				display: none
 				flex-direction: column
