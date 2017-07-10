@@ -8,7 +8,6 @@ try {
 
 } catch (error) {
 
-
 	console.log('Please Provide config.js');
 	console.log('1. make duplicate of config.default.js');
 	console.log('2. name it config.js');
@@ -33,6 +32,8 @@ const minify = require('express-minify');
 const request = require('request-promise-native');
 
 const app = express();
+
+app.disable('x-powered-by');
 
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/source/templates/');
