@@ -1,105 +1,106 @@
 <template>
-	<div>
-		<div id="loadingBar">
-			<div class="bar"></div>
-		</div>
-		<section id="input-data">
-			<div id="meta-data">
-				<div class="heading">Meta-Data</div>
-				<div class="title">
-					<label for="meta-text">Title</label>
-					<input id="meta-text" type="text" v-model="metaData.title" autofocus/>
-				</div>
-				<div class="creators">
-					<label>Creators</label>
-					<div v-for="creator, key in metaData.creators" class="creator">
-						<input type="text" v-model="metaData.creators[key]" :ref="'creator' + key">
-						<div class="close" v-on:click="removeCreator(key)">✖</div>
+	<div id="main-wrapper">
+		<div class="left">
+			<section id="input-data">
+				<div id="meta-data">
+					<div class="heading">Meta-Data</div>
+					<div class="title">
+						<label for="meta-text">Title</label>
+						<input id="meta-text" type="text" v-model="metaData.title" autofocus/>
 					</div>
-					<button type="button" v-on:click="addCreator"></button>
-				</div>
-			</div>
-			<div id="text">
-				<div class="heading">Texteditor</div>
-				<input id="x" type="hidden" ref="editorText">
-				<trix-editor class="editor-content" input="x"></trix-editor>
-			</div>
-		</section>
-		<div id="generate">
-			<button type="button" class="generate-button" v-on:click="generate">Generate ISCC</button>
-		</div>
-		<section id="result">
-			<div class="heading">ISCC</div>
-			<div class="id" id="metaID">Meta-ID
-				<div class="value">{{ iscc.meta_id.code }}</div>
-			</div>
-			<div class="id" id="contentID">Content-ID
-				<div class="value">{{ iscc.content_id.code }}</div>
-			</div>
-			<div class="id" id="dataID">Data-ID
-				<div class="value">{{ iscc.data_id.code }}</div>
-			</div>
-			<div class="id" id="instanceID">Instance-ID
-				<div class="value">{{ iscc.instance_id.code }}</div>
-			</div>
-		</section>
-		<section id="log">
-			<div class="heading">Log</div>
-			<div class="logEntries">
-				<div v-for="entry, key in log" class="logEntry">
-					<input type="checkbox" name="flip" :id="'entry' + key">
-					<label class="flip" :for="'entry' + key"></label>
-					<div class="date">{{ entry.time }}</div>
-					<div class="iscc">{{ entry.iscc.meta_id.code }} - {{ entry.iscc.content_id.code }} - {{
-						entry.iscc.data_id.code }} - {{ entry.iscc.instance_id.code }}
+					<div class="creators">
+						<label>Creators</label>
+						<div v-for="creator, key in metaData.creators" class="creator">
+							<input type="text" v-model="metaData.creators[key]" :ref="'creator' + key">
+							<div class="close" v-on:click="removeCreator(key)">✖</div>
+						</div>
+						<button type="button" v-on:click="addCreator"></button>
 					</div>
-					<div class="flipper">
-						<div class="front">
-							<div class="row">
-								<div class="label" data-id="metaID">
-									Meta-ID
+				</div>
+				<div id="text">
+					<div class="heading">Texteditor</div>
+					<input id="x" type="hidden" ref="editorText">
+					<trix-editor class="editor-content" input="x"></trix-editor>
+				</div>
+			</section>
+			<div id="generate">
+				<button type="button" class="generate-button" v-on:click="generate">Generate ISCC</button>
+			</div>
+			<section id="result">
+				<div class="heading">ISCC</div>
+				<div class="id" id="metaID">Meta-ID
+					<div class="value">{{ iscc.meta_id.code }}</div>
+				</div>
+				<div class="id" id="contentID">Content-ID
+					<div class="value">{{ iscc.content_id.code }}</div>
+				</div>
+				<div class="id" id="dataID">Data-ID
+					<div class="value">{{ iscc.data_id.code }}</div>
+				</div>
+				<div class="id" id="instanceID">Instance-ID
+					<div class="value">{{ iscc.instance_id.code }}</div>
+				</div>
+			</section>
+		</div>
+		<div class="right">
+			<section id="log">
+				<div class="heading">Log</div>
+				<div class="logEntries">
+					<div v-for="entry, key in log" class="logEntry">
+						<input type="checkbox" name="flip" :id="'entry' + key">
+						<label class="flip" :for="'entry' + key"></label>
+						<div class="date">{{ entry.time }}</div>
+						<div class="iscc">{{ entry.iscc.meta_id.code }} - {{ entry.iscc.content_id.code }} - {{
+							entry.iscc.data_id.code }} - {{ entry.iscc.instance_id.code }}
+						</div>
+						<div class="flipper">
+							<div class="front">
+								<div class="row">
+									<div class="label" data-id="metaID">
+										Meta-ID
+									</div>
+									<div class="bits" :data-sim="entry.sim.meta_id">
+										<span v-for="bit, bitKey in entry.iscc.meta_id.bits" :class="{diff: entry.diff && !entry.diff.meta_id[bitKey]}">{{ bit }}</span>
+									</div>
 								</div>
-								<div class="bits" :data-sim="entry.sim.meta_id">
-									<span v-for="bit, bitKey in entry.iscc.meta_id.bits" :class="{diff: entry.diff && !entry.diff.meta_id[bitKey]}">{{ bit }}</span>
+								<div class="row">
+									<div class="label" data-id="contentID">
+										Content-ID
+									</div>
+									<div class="bits" :data-sim="entry.sim.content_id">
+										<span v-for="bit, bitKey in entry.iscc.content_id.bits" :class="{diff: entry.diff && !entry.diff.content_id[bitKey]}">{{ bit }}</span>
+									</div>
+								</div>
+								<div class="row">
+									<div class="label" data-id="dataID">
+										Data-ID
+									</div>
+									<div class="bits" :data-sim="entry.sim.data_id">
+										<span v-for="bit, bitKey in entry.iscc.data_id.bits" :class="{diff: entry.diff && !entry.diff.data_id[bitKey]}">{{ bit }}</span>
+									</div>
+								</div>
+								<div class="row">
+									<div class="label" data-id="instanceID">
+										Instance-ID
+									</div>
+									<div class="bits" :data-sim="entry.sim.instance_id">
+										<span v-for="bit, bitKey in entry.iscc.instance_id.bits" :class="{diff: entry.diff && !entry.diff.instance_id[bitKey]}">{{ bit }}</span>
+									</div>
 								</div>
 							</div>
-							<div class="row">
-								<div class="label" data-id="contentID">
-									Content-ID
-								</div>
-								<div class="bits" :data-sim="entry.sim.content_id">
-									<span v-for="bit, bitKey in entry.iscc.content_id.bits" :class="{diff: entry.diff && !entry.diff.content_id[bitKey]}">{{ bit }}</span>
-								</div>
-							</div>
-							<div class="row">
-								<div class="label" data-id="dataID">
-									Data-ID
-								</div>
-								<div class="bits" :data-sim="entry.sim.data_id">
-									<span v-for="bit, bitKey in entry.iscc.data_id.bits" :class="{diff: entry.diff && !entry.diff.data_id[bitKey]}">{{ bit }}</span>
-								</div>
-							</div>
-							<div class="row">
-								<div class="label" data-id="instanceID">
-									Instance-ID
-								</div>
-								<div class="bits" :data-sim="entry.sim.instance_id">
-									<span v-for="bit, bitKey in entry.iscc.instance_id.bits" :class="{diff: entry.diff && !entry.diff.instance_id[bitKey]}">{{ bit }}</span>
-								</div>
+							<div class="back">
+								<div class="title">Title: {{ entry.title }}</div>
+								<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators.join('; ') }}</div>
+								<label class="text"><input type="checkbox">
+									<div class="short" v-html="entry.text.substring(0, 100) + (entry.text.length > 100 ? '...' : '')"></div>
+									<div class="long" v-html="entry.text"></div>
+								</label>
 							</div>
 						</div>
-						<div class="back">
-							<div class="title">Title: {{ entry.title }}</div>
-							<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators.join('; ') }}</div>
-							<label class="text"><input type="checkbox">
-								<div class="short" v-html="entry.text.substring(0, 100) + (entry.text.length > 100 ? '...' : '')"></div>
-								<div class="long" v-html="entry.text"></div>
-							</label>
-						</div>
 					</div>
 				</div>
-			</div>
-		</section>
+			</section>
+		</div>
 	</div>
 </template>
 <script>
@@ -300,6 +301,11 @@ section {
 	}
 }
 
+#main-wrapper {
+	display: flex;
+	flex-direction: column;
+}
+
 #input-data {
 	display: flex;
 	flex-flow: row wrap;
@@ -375,6 +381,7 @@ section {
 	display: flex;
 	flex-direction: column;
 	margin-top: 2rem;
+	width: 100%;
 
 	& .heading {
 		flex: none;
@@ -431,29 +438,6 @@ section {
 	& .id.changed {
 		color: #ff9800;
 	}
-}
-
-#loadingBar {
-	flex-basis: calc(100% + 1rem);
-	height: .2rem;
-	position: relative;
-	overflow: hidden;
-
-	& .bar {
-		display: block;
-		position: absolute;
-		content: "";
-		height: .2rem;
-		background-color: #008be8;
-	}
-}
-
-#loadingBar.loading {
-		& .bar {
-			left: -50%;
-			width: 25%;
-			animation: loading 3s ease infinite;
-		}
 }
 
 #generate {
@@ -570,7 +554,6 @@ section {
 
 					& .row {
 						display: flex;
-						justify-content: center;
 						align-items: center;
 					}
 					& .row:not(:last-of-type) {
@@ -650,15 +633,28 @@ section {
 }
 
 @media (min-width: 1200px) {
-	#input-data {
-		justify-content: space-between;
+	#main-wrapper {
+		flex-direction: row;
+
+		& .left {
+			flex-basis: 50%;
+			width: 50%;
+		}
+
+		& .right {
+			flex-basis: 50%;
+			width: 50%;
+		}
 	}
-	#meta-data {
-		flex-basis: calc(50% - 2rem);
-	}
-	#text {
-		flex-basis: calc(50% - 2rem);
-		margin-top: 0;
+
+	#result {
+		& .heading {
+			flex-basis: 100%;
+		}
+		& .id {
+			padding: .5rem;
+			font-size: 0.9rem
+		}
 	}
 }
 </style>
