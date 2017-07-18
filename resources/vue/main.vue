@@ -5,12 +5,32 @@
 				<div id="meta-data">
 					<div class="heading">Meta-Data</div>
 					<div class="title">
-						<label for="meta-text">Title <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div></label>
+						<label for="meta-text">Title
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">
+								The title of your content will be used to create the Meta-ID component of the final ISCC.<br>
+								This is the only required field to create a valid Meta-ID component.<br>
+								Similar title information will create Meta-IDs that are also similar.
+							</div>
+						</label>
 						<input id="meta-text" v-on:input="entryDataChanged = true;" v-on:paste="entryDataChanged = true;"
 									 type="text" v-model="metaData.title" autofocus/>
 					</div>
 					<div class="creators">
-						<label>Creators <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div></label>
+						<label>Creators
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">
+								List the main creators of the content here.<br>
+								Different ways to write a creator´s name will generate identical or similar Meta-IDs.<br>
+								To see how the Meta-ID stays the same, generate separate ISCC with these variations in the creators
+								field:
+								<ul>
+									<li>Dorian Gray</li>
+									<li>D. Gray</li>
+									<li>Gray, Dorian</li>
+								</ul>
+							</div>
+						</label>
 						<div v-for="creator, key in metaData.creators" class="creator">
 							<input type="text" v-model="metaData.creators[key]" v-on:input="entryDataChanged = true;"
 										 v-on:paste="entryDataChanged = true;" :ref="'creator' + key">
@@ -20,7 +40,21 @@
 					</div>
 				</div>
 				<div id="text">
-					<div class="heading">Texteditor <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div></div>
+					<div class="heading">Texteditor
+						<img class="help-icon" src="../images/question.svg">
+						<div class="help-text">
+							Put your text content here.<br>
+							The Content-ID, Data-ID and Instance-ID are created from this.<br>
+							Different kinds of changes will affect differents parts of the ISCC code.<br>
+							For example if you just change a word to bold in the text, it will:
+							<ul>
+								<li>not change the Meta-ID</li>
+								<li>not change the Content-ID</li>
+								<li>small change to Data-ID</li>
+								<li>big change to Instance-ID</li>
+							</ul>
+						</div>
+					</div>
 					<input id="x" type="hidden" ref="editorText">
 					<trix-editor class="editor-content" v-on:input="entryDataChanged = true;"
 											 v-on:paste="entryDataChanged = true;" input="x"></trix-editor>
@@ -35,19 +69,22 @@
 			<section id="result">
 				<div class="heading">ISCC</div>
 				<div class="id" id="metaID"><span>Meta-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+					<div class="help-text">Generated from Title and Creators fields. Encodes similarity of Metadata.</div>
 					<div class="value">{{ iscc.meta_id.code }}</div>
 				</div>
 				<div class="id" id="contentID"><span>Content-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+					<div class="help-text">
+						Generated from the extracted plain text content without text formatting. Encodes structural content
+						similarity.
+					</div>
 					<div class="value">{{ iscc.content_id.code }}</div>
 				</div>
 				<div class="id" id="dataID"><span>Data-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+					<div class="help-text">Generated from the formated text in the editor. Encodes raw data similarity.</div>
 					<div class="value">{{ iscc.data_id.code }}</div>
 				</div>
 				<div class="id" id="instanceID"><span>Instance-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+					<div class="help-text">Generated from the formated text in the editor. A checksum used for data integrity.</div>
 					<div class="value">{{ iscc.instance_id.code }}</div>
 				</div>
 			</section>
@@ -55,7 +92,16 @@
 		<div class="right">
 			<section id="log">
 				<div class="heading">
-					<span>Log</span>
+					<div class="heading-text">
+						<span>Log </span>
+						<img class="help-icon" src="../images/question.svg">
+						<div class="help-text">
+							Every time you generate an ISCC a new Log entry is created for you.<br>
+							It shows the decoded raw bits of the ISCC one line per component.<br>
+							If you change the data in the the form and generate a new ISCC the Log will also show which bits are
+							affected by your change of data.
+						</div>
+					</div>
 					<button type="button" v-on:click="clearLog" :disabled="log.length == 0">Clear Log</button>
 				</div>
 				<div class="logEntries">
@@ -272,6 +318,7 @@ export default{
 	}
 }
 
+
 </script>
 <style>
 @import 'https://fonts.googleapis.com/css?family=Roboto';
@@ -473,10 +520,16 @@ section {
 		flex: none;
 		display: flex;
 		align-items: center;
+		position: relative;
 
 		& .help-icon,
 		& .help-text {
 			margin-left: .3rem;
+		}
+		& .help-text {
+			position: absolute;
+			z-index: 1;
+			top: 100%;
 		}
 	}
 
@@ -520,7 +573,6 @@ section {
 		flex: 1;
 		text-align: center;
 		padding: .5rem 0;
-		text-transform: capitalize;
 
 		& .help-icon {
 			& + .help-text {
@@ -568,6 +620,19 @@ section {
 	& .heading {
 		display: flex;
 		justify-content: space-between;
+		position: relative;
+
+		& .heading-text {
+			& .help-icon,
+			& .help-text {
+				margin-left: .3rem;
+			}
+			& .help-text {
+				position: absolute;
+				z-index: 1;
+				top: 100%;
+			}
+		}
 
 		& button {
 			padding: .5rem;
@@ -704,7 +769,6 @@ section {
 						background-color: rgba(255,255,255,.5);
 						font-weight: bold;
 						text-align: center;
-						text-transform: uppercase;
 						font-size: .8rem;
 						line-height: 1.2rem;
 						opacity: 0;
@@ -821,7 +885,5 @@ section {
 		}
 	}
 }
-
-
 
 </style>
