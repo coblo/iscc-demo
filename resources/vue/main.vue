@@ -600,7 +600,7 @@ section {
 
 				& .front, & .back {
 					width: 100%;
-					height: 5.5rem;
+					height: 6rem;
 					overflow-y: auto;
 				}
 
