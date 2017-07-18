@@ -6,13 +6,15 @@
 					<div class="heading">Meta-Data</div>
 					<div class="title">
 						<label for="meta-text">Title</label>
-						<input id="meta-text" type="text" v-model="metaData.title" autofocus/>
+						<input id="meta-text" v-on:input="entryDataChanged = true;" v-on:paste="entryDataChanged = true;"
+									 type="text" v-model="metaData.title" autofocus/>
 					</div>
 					<div class="creators">
 						<label>Creators</label>
 						<div v-for="creator, key in metaData.creators" class="creator">
-							<input type="text" v-model="metaData.creators[key]" :ref="'creator' + key">
-							<div class="close" v-on:click="removeCreator(key)">✖</div>
+							<input type="text" v-model="metaData.creators[key]" v-on:input="entryDataChanged = true;"
+										 v-on:paste="entryDataChanged = true;" :ref="'creator' + key">
+							<div class="close" v-on:click="removeCreator(key)">&#10006;</div>
 						</div>
 						<button type="button" v-on:click="addCreator"></button>
 					</div>
@@ -20,11 +22,15 @@
 				<div id="text">
 					<div class="heading">Texteditor</div>
 					<input id="x" type="hidden" ref="editorText">
-					<trix-editor class="editor-content" input="x"></trix-editor>
+					<trix-editor class="editor-content" v-on:input="entryDataChanged = true;"
+											 v-on:paste="entryDataChanged = true;" input="x"></trix-editor>
 				</div>
 			</section>
 			<div id="generate">
-				<button type="button" class="generate-button" v-on:click="generate">Generate ISCC</button>
+				<button type="button" :disabled="!entryDataChanged || !metaData.title" class="generate-button"
+								v-on:click="generate">
+					Generate ISCC
+				</button>
 			</div>
 			<section id="result">
 				<div class="heading">ISCC</div>
@@ -50,8 +56,11 @@
 						<input type="checkbox" name="flip" :id="'entry' + key">
 						<label class="flip" :for="'entry' + key"></label>
 						<div class="date">{{ entry.time }}</div>
-						<div class="iscc">{{ entry.iscc.meta_id.code }} - {{ entry.iscc.content_id.code }} - {{
-							entry.iscc.data_id.code }} - {{ entry.iscc.instance_id.code }}
+						<div class="iscc">
+							<span title="Meta-ID">{{ entry.iscc.meta_id.code }}</span> -
+							<span title="Content-ID">{{ entry.iscc.content_id.code }}</span> -
+							<span title="Data-ID">{{ entry.iscc.data_id.code }}</span> -
+							<span title="Instance-ID">{{ entry.iscc.instance_id.code }}</span>
 						</div>
 						<div class="flipper">
 							<div class="front">
@@ -60,7 +69,8 @@
 										Meta-ID
 									</div>
 									<div class="bits" :data-sim="entry.sim.meta_id">
-										<span v-for="bit, bitKey in entry.iscc.meta_id.bits" :class="{diff: entry.diff && !entry.diff.meta_id[bitKey]}">{{ bit }}</span>
+										<span v-for="bit, bitKey in entry.iscc.meta_id.bits"
+													:class="{diff: entry.diff && !entry.diff.meta_id[bitKey]}">{{ bit }}</span>
 									</div>
 								</div>
 								<div class="row">
@@ -68,7 +78,8 @@
 										Content-ID
 									</div>
 									<div class="bits" :data-sim="entry.sim.content_id">
-										<span v-for="bit, bitKey in entry.iscc.content_id.bits" :class="{diff: entry.diff && !entry.diff.content_id[bitKey]}">{{ bit }}</span>
+										<span v-for="bit, bitKey in entry.iscc.content_id.bits"
+													:class="{diff: entry.diff && !entry.diff.content_id[bitKey]}">{{ bit }}</span>
 									</div>
 								</div>
 								<div class="row">
@@ -76,7 +87,8 @@
 										Data-ID
 									</div>
 									<div class="bits" :data-sim="entry.sim.data_id">
-										<span v-for="bit, bitKey in entry.iscc.data_id.bits" :class="{diff: entry.diff && !entry.diff.data_id[bitKey]}">{{ bit }}</span>
+										<span v-for="bit, bitKey in entry.iscc.data_id.bits"
+													:class="{diff: entry.diff && !entry.diff.data_id[bitKey]}">{{ bit }}</span>
 									</div>
 								</div>
 								<div class="row">
@@ -84,7 +96,8 @@
 										Instance-ID
 									</div>
 									<div class="bits" :data-sim="entry.sim.instance_id">
-										<span v-for="bit, bitKey in entry.iscc.instance_id.bits" :class="{diff: entry.diff && !entry.diff.instance_id[bitKey]}">{{ bit }}</span>
+										<span v-for="bit, bitKey in entry.iscc.instance_id.bits"
+													:class="{diff: entry.diff && !entry.diff.instance_id[bitKey]}">{{ bit }}</span>
 									</div>
 								</div>
 							</div>
@@ -92,7 +105,8 @@
 								<div class="title">Title: {{ entry.title }}</div>
 								<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators.join('; ') }}</div>
 								<label class="text"><input type="checkbox">
-									<div class="short" v-html="entry.text.substring(0, 100) + (entry.text.length > 100 ? '...' : '')"></div>
+									<div class="short"
+											 v-html="entry.text.substring(0, 100) + (entry.text.length > 100 ? '...' : '')"></div>
 									<div class="long" v-html="entry.text"></div>
 								</label>
 							</div>
@@ -130,7 +144,8 @@ export default{
 				creators: []
 			},
 			text: '',
-			log: []
+			log: [],
+			entryDataChanged: false
 		}
 	},
 	methods: {
@@ -202,6 +217,7 @@ export default{
 							diff: differences,
 							sim: similarity
 						});
+						this.entryDataChanged = false;
 					})
 				})
 			})
@@ -212,6 +228,7 @@ export default{
 			Vue.nextTick(function() {
 				that.$refs['creator' + (that.metaData.creators.length - 1)][0].focus();
 			})
+			this.entryDataChanged = true;
 		},
 		removeCreator: function (key) {
 			this.metaData.creators.splice(key, 1);
@@ -229,6 +246,17 @@ export default{
 			}, 0);
 			return Math.round(true_count / (2 * bool_array.length - true_count) * 100);
 		}
+	},
+	mounted: function () {
+		let that = this;
+		let trixButtonsWrapper = document.getElementById('trix-toolbar-1');
+		let trixButtons = trixButtonsWrapper.getElementsByTagName('button');
+
+		for (let i = 0; i < trixButtons.length; ++i) {
+			trixButtons[i].addEventListener("click", function () {
+				that.entryDataChanged = true;
+			})
+		}
 	}
 }
 
@@ -244,7 +272,13 @@ export default{
 	padding: 0;
 	border: none;
 	color: inherit;
-	font-family: roboto;
+	font-family: roboto, sanserif;
+}
+
+pre {
+	font-family: monospace;
+	white-space: pre;
+	margin: 1em 0;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -653,4 +687,7 @@ section {
 		}
 	}
 }
+
+
+
 </style>
