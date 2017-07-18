@@ -5,12 +5,12 @@
 				<div id="meta-data">
 					<div class="heading">Meta-Data</div>
 					<div class="title">
-						<label for="meta-text">Title</label>
+						<label for="meta-text">Title <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div></label>
 						<input id="meta-text" v-on:input="entryDataChanged = true;" v-on:paste="entryDataChanged = true;"
 									 type="text" v-model="metaData.title" autofocus/>
 					</div>
 					<div class="creators">
-						<label>Creators</label>
+						<label>Creators <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div></label>
 						<div v-for="creator, key in metaData.creators" class="creator">
 							<input type="text" v-model="metaData.creators[key]" v-on:input="entryDataChanged = true;"
 										 v-on:paste="entryDataChanged = true;" :ref="'creator' + key">
@@ -20,7 +20,7 @@
 					</div>
 				</div>
 				<div id="text">
-					<div class="heading">Texteditor</div>
+					<div class="heading">Texteditor <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div></div>
 					<input id="x" type="hidden" ref="editorText">
 					<trix-editor class="editor-content" v-on:input="entryDataChanged = true;"
 											 v-on:paste="entryDataChanged = true;" input="x"></trix-editor>
@@ -34,16 +34,16 @@
 			</div>
 			<section id="result">
 				<div class="heading">ISCC</div>
-				<div class="id" id="metaID">Meta-ID
+				<div class="id" id="metaID">Meta-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.meta_id.code }}</div>
 				</div>
-				<div class="id" id="contentID">Content-ID
+				<div class="id" id="contentID">Content-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.content_id.code }}</div>
 				</div>
-				<div class="id" id="dataID">Data-ID
+				<div class="id" id="dataID">Data-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.data_id.code }}</div>
 				</div>
-				<div class="id" id="instanceID">Instance-ID
+				<div class="id" id="instanceID">Instance-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.instance_id.code }}</div>
 				</div>
 			</section>
@@ -341,6 +341,25 @@ section {
 	}
 }
 
+.help-icon {
+	display: inline-block;
+	width: 1rem;
+	cursor: pointer;
+
+	& + .help-text {
+		display: none;
+		padding: 3px;
+		border: 1px solid #444;
+		background: #fff;
+		border-radius: 6px;
+		font-size: .7rem;
+	}
+
+	&:hover + .help-text {
+		 display: block;
+	}
+}
+
 #main-wrapper {
 	display: flex;
 	flex-direction: column;
@@ -360,16 +379,29 @@ section {
 
 	& .title, & .creators {
 		display: flex;
-		align-items: center;
+		align-items: stretch;
 		flex-flow: row wrap;
 		background: #fff;
 		padding: .5rem;
 
 		& label {
-			width: 5rem;
+			position: relative;
+			width: 6.1rem;
 			padding: .5rem;
 			background-color: #ccc;
 			margin-right: .5rem;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+
+			& .help-text {
+				position: absolute;
+				left: 100%;
+				top: 50%;
+				transform: translate(.5rem, -50%);
+				white-space: nowrap;
+			}
 		}
 
 		& input {
@@ -382,6 +414,7 @@ section {
 		& .creator {
 			position: relative;
 			margin-bottom: .5rem;
+			display: flex;
 
 			& input {
 				padding: .5rem 1.6rem .5rem .5rem;
@@ -390,35 +423,34 @@ section {
 			& .close {
 				position: absolute;
 				right: 1rem;
-				top: .5rem;
+				top: 50%;
+				transform: translateY(-50%);
 				cursor: pointer;
-				font-size: .8rem;
+				font-size: 0.8rem;
+				line-height: 0;
 			}
 		}
 
 		& button {
-			position: relative;
-			flex-shrink: 0;
 			width: 2rem;
 			height: 2rem;
 			margin: 0 0 .5rem.5rem;
 			background: #fff;
-			font-size: 1.5rem;
-		}
-		& button:before {
-			content: '+';
 			font-size: 1.4rem;
-			position: absolute;
-			top: .5rem;
-			left: .5rem;
-			line-height: 1rem;
+			line-height: 2rem;
+			text-align: center;
+			align-self: center;
+
+			&:before {
+				content: '+';
+			}
 		}
-	}
-	& .creators {
-		padding-bottom: 0;
-		& label {
-			margin-bottom: .5rem;
-		}
+		& .creators {
+			padding-bottom: 0;
+				& label {
+					margin-bottom: .5rem;
+				}
+			}
 	}
 }
 
@@ -431,6 +463,13 @@ section {
 
 	& .heading {
 		flex: none;
+		display: flex;
+		align-items: center;
+
+		& .help-icon,
+		& .help-text {
+			margin-left: .3rem;
+		}
 	}
 
 	& .editor-content {
@@ -469,10 +508,25 @@ section {
 	}
 
 	& .id {
+		position: relative;
 		flex: 1;
 		text-align: center;
 		padding: .5rem;
 		text-transform: capitalize;
+
+		& .help-icon {
+			& + .help-text {
+				position: absolute;
+				top: -.5rem;
+				left: 0;
+				width: 100%;
+				-webkit-transform: translateY(-100%);
+				-moz-transform: translateY(-100%);
+				-ms-transform: translateY(-100%);
+				-o-transform: translateY(-100%);
+				transform: translateY(-100%);
+			}
+		}
 
 		& .value {
 			margin-top: 1rem;
