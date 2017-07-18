@@ -401,6 +401,7 @@ section {
 				top: 50%;
 				transform: translate(.5rem, -50%);
 				white-space: nowrap;
+				z-index: 1;
 			}
 		}
 
@@ -445,13 +446,16 @@ section {
 				content: '+';
 			}
 		}
-		& .creators {
-			padding-bottom: 0;
-				& label {
-					margin-bottom: .5rem;
-				}
-			}
 	}
+
+	& .creators {
+		padding-bottom: 0;
+
+		& label {
+			margin-bottom: .5rem;
+		}
+	}
+
 }
 
 #text {
