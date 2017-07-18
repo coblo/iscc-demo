@@ -50,7 +50,10 @@
 		</div>
 		<div class="right">
 			<section id="log">
-				<div class="heading">Log</div>
+				<div class="heading">
+					<span>Log</span>
+					<button type="button" v-on:click="clearLog" :disabled="log.length == 0">Clear Log</button>
+				</div>
 				<div class="logEntries">
 					<div v-for="entry, key in log" class="logEntry">
 						<input type="checkbox" name="flip" :id="'entry' + key">
@@ -245,6 +248,11 @@ export default{
 				return b ? a + 1 : a;
 			}, 0);
 			return Math.round(true_count / (2 * bool_array.length - true_count) * 100);
+		},
+		clearLog: function () {
+			if (confirm('Really clear log?')) {
+				this.log = [];
+			}
 		}
 	},
 	mounted: function () {
@@ -495,6 +503,18 @@ section {
 }
 
 #log {
+	& .heading {
+		display: flex;
+		justify-content: space-between;
+
+		& button {
+			padding: .5rem;
+		}
+
+		& button:disabled {
+			background-color: #eaeaea;
+		}
+	}
 	& .logEntries {
 		display: flex;
 		flex-direction: column-reverse;
