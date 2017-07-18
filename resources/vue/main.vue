@@ -515,7 +515,7 @@ section {
 		position: relative;
 		flex: 1;
 		text-align: center;
-		padding: .5rem;
+		padding: .5rem 0;
 		text-transform: capitalize;
 
 		& .help-icon {
@@ -658,7 +658,7 @@ section {
 
 				& .front, & .back {
 					width: 100%;
-					height: 6rem;
+					height: 6.5rem;
 					overflow-y: auto;
 				}
 
@@ -766,7 +766,6 @@ section {
 			margin-top: auto;
 		}
 		& .id {
-			padding: .5rem;
 			font-size: 0.9rem
 		}
 	}
