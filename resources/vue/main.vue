@@ -34,16 +34,20 @@
 			</div>
 			<section id="result">
 				<div class="heading">ISCC</div>
-				<div class="id" id="metaID">Meta-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+				<div class="id" id="metaID"><span>Meta-ID</span> <img class="help-icon" src="../images/question.svg">
+					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.meta_id.code }}</div>
 				</div>
-				<div class="id" id="contentID">Content-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+				<div class="id" id="contentID"><span>Content-ID</span> <img class="help-icon" src="../images/question.svg">
+					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.content_id.code }}</div>
 				</div>
-				<div class="id" id="dataID">Data-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+				<div class="id" id="dataID"><span>Data-ID</span> <img class="help-icon" src="../images/question.svg">
+					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.data_id.code }}</div>
 				</div>
-				<div class="id" id="instanceID">Instance-ID <img class="help-icon" src="../images/question.svg"><div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
+				<div class="id" id="instanceID"><span>Instance-ID</span> <img class="help-icon" src="../images/question.svg">
+					<div class="help-text">This is only a placeholder text and you don't have to worry about the content because it will be replaced anyway</div>
 					<div class="value">{{ iscc.instance_id.code }}</div>
 				</div>
 			</section>
@@ -767,6 +771,53 @@ section {
 		}
 		& .id {
 			font-size: 0.9rem
+		}
+	}
+}
+
+@media (max-width: 750px) {
+	#trix-toolbar-1 {
+		& .button_row {
+			& .button_group {
+				margin-right: .2rem;
+				& button {
+					width: 1.6em;
+				}
+			}
+		}
+	}
+	#result {
+		flex-flow: row wrap;
+
+		& .heading {
+			flex-basis: 100%;
+		}
+		& .id {
+			flex-basis: 100%;
+			text-align: start;
+			& span {
+				margin-left: 1rem;
+			}
+
+			& .value {
+				display: inline;
+				margin: 0;
+				float: right;
+				width: 50%;
+				text-align: center;
+				padding: .5rem;
+			}
+		}
+	}
+	#log {
+		& .logEntries {
+			& .logEntry {
+				& .front {
+					& .label {
+						white-space: nowrap;
+					}
+				}
+			}
 		}
 	}
 }
