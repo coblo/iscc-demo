@@ -344,7 +344,7 @@ section {
 }
 
 #meta-data {
-	flex-basis: 100%;
+	width: 100%;
 
 	& .title {
 		margin-bottom: 1rem;
@@ -353,26 +353,27 @@ section {
 	& .title, & .creators {
 		display: flex;
 		align-items: center;
+		flex-flow: row wrap;
 		background: #fff;
-		overflow-x: auto;
+		padding: .5rem;
 
 		& label {
 			width: 5rem;
 			padding: .5rem;
 			background-color: #ccc;
-			margin: .5rem;
+			margin-right: .5rem;
 		}
 
 		& input {
 			padding: .5rem;
 			flex: 1;
 			background: #eee;
-			margin: .5rem 0;
 			margin-right: .5rem;
 		}
 
 		& .creator {
 			position: relative;
+			margin-bottom: .5rem;
 
 			& input {
 				padding: .5rem 1.6rem .5rem .5rem;
@@ -381,9 +382,9 @@ section {
 			& .close {
 				position: absolute;
 				right: 1rem;
-				top: 0.9rem;
+				top: .5rem;
 				cursor: pointer;
-				font-size: 0.8rem;
+				font-size: .8rem;
 			}
 		}
 
@@ -392,7 +393,7 @@ section {
 			flex-shrink: 0;
 			width: 2rem;
 			height: 2rem;
-			margin-right: .5rem;
+			margin: 0 0 .5rem.5rem;
 			background: #fff;
 			font-size: 1.5rem;
 		}
@@ -404,7 +405,12 @@ section {
 			left: .5rem;
 			line-height: 1rem;
 		}
-
+	}
+	& .creators {
+		padding-bottom: 0;
+		& label {
+			margin-bottom: .5rem;
+		}
 	}
 }
 
