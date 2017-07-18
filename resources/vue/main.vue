@@ -150,15 +150,13 @@ export default{
 				lastBits = this.log[this.log.length - 1];
 			}
 
-			let form_data = new FormData();
-			form_data.append('title', this.metaData.title);
-			form_data.append('creators', this.metaData.creators.join(';'));
-			this.$http.post(config.apiUrl + '/generate/meta_id', form_data).then((response) => {
+			this.$http.post(config.apiUrl + '/generate/meta_id', {
+				'title': this.metaData.title,
+				'creators': this.metaData.creators.join(';')
+			}).then((response) => {
 				iscc.meta_id = response.body.meta_id;
 
-				form_data = new FormData();
-				form_data.append('text', rawText);
-				this.$http.post(config.apiUrl + '/generate/content_id_text', form_data).then((response) => {
+				this.$http.post(config.apiUrl + '/generate/content_id_text', {'text': rawText}).then((response) => {
 					iscc.content_id = response.body.content_id;
 
 					this.$http.post(config.apiUrl + '/generate/data_instance_id', htmlText || ' ', {
@@ -428,15 +426,12 @@ section {
 		padding: .5rem;
 		text-transform: capitalize;
 
-		& .value
+		& .value {
 			margin-top: 1rem;
 			background: #fff;
 			padding: 1rem;
 			color: #000;
-	}
-
-	& .id.changed {
-		color: #ff9800;
+		}
 	}
 }
 
@@ -649,7 +644,8 @@ section {
 
 	#result {
 		& .heading {
-			flex-basis: 100%;
+			margin-bottom: 1.25rem;
+			margin-top: auto;
 		}
 		& .id {
 			padding: .5rem;
