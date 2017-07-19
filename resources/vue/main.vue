@@ -205,6 +205,7 @@ export default{
 		generate: function () {
 			let that = this;
 			let iscc = [];
+			this.entryDataChanged = false;
 
 			// to get the raw text we add the html to a tmp div and read the text
 			let htmlText = this.$refs.editorText.value;
@@ -270,7 +271,6 @@ export default{
 							diff: differences,
 							sim: similarity
 						});
-						this.entryDataChanged = false;
 					})
 				})
 			})
@@ -403,7 +403,7 @@ section {
 		border: 1px solid #444;
 		background: #fff;
 		border-radius: 6px;
-		font-size: .7rem;
+		font-size: .8rem;
 	}
 
 	&:hover + .help-text {
@@ -840,6 +840,12 @@ section {
 }
 
 @media (max-width: 750px) {
+	body {
+		padding: 0;
+	}
+	section {
+		margin: 0;
+	}
 	#trix-toolbar-1 {
 		& .button_row {
 			& .button_group {
@@ -879,6 +885,13 @@ section {
 				& .front {
 					& .label {
 						white-space: nowrap;
+						width: 4rem;
+					}
+					& .bits {
+						width: calc(100% - 4rem);
+						& span {
+							font-size: 0.7rem;
+						}
 					}
 				}
 			}
