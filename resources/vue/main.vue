@@ -156,7 +156,7 @@
 							</div>
 							<div class="back">
 								<div class="title">Title: {{ entry.title }}</div>
-								<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators.join('; ') }}</div>
+								<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators }}</div>
 								<label class="text"><input type="checkbox">
 									<div class="short"
 											 v-html="entry.text.substring(0, 100) + (entry.text.length > 100 ? '...' : '')"></div>
@@ -266,7 +266,7 @@ export default{
 							iscc: iscc,
 							time: timeStamp,
 							title: that.metaData.title,
-							creators: that.metaData.creators,
+							creators: that.metaData.creators.join('; '),
 							text: htmlText,
 							diff: differences,
 							sim: similarity
