@@ -1,7 +1,7 @@
 <template>
-	<h1>ISCC Web Demo v0.1</h1>
-	<h2>Creating ISCC identifiers for text content.</h2>
 	<div>
+		<h1>ISCC Web Demo v0.1</h1>
+		<h2>Creating ISCC identifiers for text content</h2>
 		<div id="main-wrapper">
 			<div class="left">
 				<section id="input-data">
