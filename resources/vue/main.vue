@@ -1,174 +1,188 @@
 <template>
-	<div id="main-wrapper">
-		<div class="left">
-			<section id="input-data">
-				<div id="meta-data">
-					<div class="heading">Meta-Data</div>
-					<div class="title">
-						<label for="meta-text">Title
-							<img class="help-icon" src="../images/question.svg">
-							<div class="help-text">
-								The title of your content will be used to create the Meta-ID component of the final ISCC.<br>
-								This is the only required field to create a valid Meta-ID component.<br>
-								Similar title information will create Meta-IDs that are also similar.
+	<div>
+		<div id="main-wrapper">
+			<div class="left">
+				<section id="input-data">
+					<div id="meta-data">
+						<div class="heading">Meta-Data</div>
+						<div class="title">
+							<label for="meta-text">Title
+								<img class="help-icon" src="../images/question.svg">
+								<div class="help-text">
+									The title of your content will be used to create the Meta-ID component of the final ISCC.<br>
+									This is the only required field to create a valid Meta-ID component.<br>
+									Similar title information will create Meta-IDs that are also similar.
+								</div>
+							</label>
+							<input id="meta-text" v-on:input="entryDataChanged = true;" v-on:paste="entryDataChanged = true;"
+								   type="text" v-model="metaData.title" autofocus/>
+						</div>
+						<div class="creators">
+							<label>Creators
+								<img class="help-icon" src="../images/question.svg">
+								<div class="help-text">
+									List the main creators of the content here.<br>
+									Different ways to write a creator´s name will generate identical or similar Meta-IDs.<br>
+									To see how the Meta-ID stays the same, generate separate ISCC with these variations in the creators
+									field:
+									<ul>
+										<li>Dorian Gray</li>
+										<li>D. Gray</li>
+										<li>Gray, Dorian</li>
+									</ul>
+								</div>
+							</label>
+							<div v-for="creator, key in metaData.creators" class="creator">
+								<input type="text" v-model="metaData.creators[key]" v-on:input="entryDataChanged = true;"
+									   v-on:paste="entryDataChanged = true;" :ref="'creator' + key">
+								<div class="close" v-on:click="removeCreator(key)">&#10006;</div>
 							</div>
-						</label>
-						<input id="meta-text" v-on:input="entryDataChanged = true;" v-on:paste="entryDataChanged = true;"
-									 type="text" v-model="metaData.title" autofocus/>
+							<button type="button" v-on:click="addCreator"></button>
+						</div>
 					</div>
-					<div class="creators">
-						<label>Creators
+					<div id="text">
+						<div class="heading">Texteditor
 							<img class="help-icon" src="../images/question.svg">
 							<div class="help-text">
-								List the main creators of the content here.<br>
-								Different ways to write a creator´s name will generate identical or similar Meta-IDs.<br>
-								To see how the Meta-ID stays the same, generate separate ISCC with these variations in the creators
-								field:
+								Put your text content here.<br>
+								The Content-ID, Data-ID and Instance-ID are created from this.<br>
+								Different kinds of changes will affect differents parts of the ISCC code.<br>
+								For example if you just change a word to bold in the text, it will:
 								<ul>
-									<li>Dorian Gray</li>
-									<li>D. Gray</li>
-									<li>Gray, Dorian</li>
+									<li>not change the Meta-ID</li>
+									<li>not change the Content-ID</li>
+									<li>small change to Data-ID</li>
+									<li>big change to Instance-ID</li>
 								</ul>
 							</div>
-						</label>
-						<div v-for="creator, key in metaData.creators" class="creator">
-							<input type="text" v-model="metaData.creators[key]" v-on:input="entryDataChanged = true;"
-										 v-on:paste="entryDataChanged = true;" :ref="'creator' + key">
-							<div class="close" v-on:click="removeCreator(key)">&#10006;</div>
 						</div>
-						<button type="button" v-on:click="addCreator"></button>
+						<input id="x" type="hidden" ref="editorText">
+						<trix-editor class="editor-content" v-on:input="entryDataChanged = true;"
+									 v-on:paste="entryDataChanged = true;" input="x"></trix-editor>
 					</div>
+				</section>
+				<div id="generate">
+					<button type="button" :disabled="!entryDataChanged || !metaData.title" class="generate-button"
+							v-on:click="generate">
+						Generate ISCC
+					</button>
 				</div>
-				<div id="text">
-					<div class="heading">Texteditor
-						<img class="help-icon" src="../images/question.svg">
+				<section id="result">
+					<div class="heading">ISCC</div>
+					<div class="id" id="metaID"><span>Meta-ID</span> <img class="help-icon" src="../images/question.svg">
+						<div class="help-text">Generated from Title and Creators fields. Encodes similarity of Metadata.</div>
+						<div class="value">{{ iscc.meta_id.code }}</div>
+					</div>
+					<div class="id" id="contentID"><span>Content-ID</span> <img class="help-icon" src="../images/question.svg">
 						<div class="help-text">
-							Put your text content here.<br>
-							The Content-ID, Data-ID and Instance-ID are created from this.<br>
-							Different kinds of changes will affect differents parts of the ISCC code.<br>
-							For example if you just change a word to bold in the text, it will:
-							<ul>
-								<li>not change the Meta-ID</li>
-								<li>not change the Content-ID</li>
-								<li>small change to Data-ID</li>
-								<li>big change to Instance-ID</li>
-							</ul>
+							Generated from the extracted plain text content without text formatting. Encodes structural content
+							similarity.
 						</div>
+						<div class="value">{{ iscc.content_id.code }}</div>
 					</div>
-					<input id="x" type="hidden" ref="editorText">
-					<trix-editor class="editor-content" v-on:input="entryDataChanged = true;"
-											 v-on:paste="entryDataChanged = true;" input="x"></trix-editor>
-				</div>
-			</section>
-			<div id="generate">
-				<button type="button" :disabled="!entryDataChanged || !metaData.title" class="generate-button"
-								v-on:click="generate">
-					Generate ISCC
-				</button>
+					<div class="id" id="dataID"><span>Data-ID</span> <img class="help-icon" src="../images/question.svg">
+						<div class="help-text">Generated from the formated text in the editor. Encodes raw data similarity.</div>
+						<div class="value">{{ iscc.data_id.code }}</div>
+					</div>
+					<div class="id" id="instanceID"><span>Instance-ID</span> <img class="help-icon" src="../images/question.svg">
+						<div class="help-text">Generated from the formated text in the editor. A checksum used for data integrity.</div>
+						<div class="value">{{ iscc.instance_id.code }}</div>
+					</div>
+				</section>
 			</div>
-			<section id="result">
-				<div class="heading">ISCC</div>
-				<div class="id" id="metaID"><span>Meta-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">Generated from Title and Creators fields. Encodes similarity of Metadata.</div>
-					<div class="value">{{ iscc.meta_id.code }}</div>
-				</div>
-				<div class="id" id="contentID"><span>Content-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">
-						Generated from the extracted plain text content without text formatting. Encodes structural content
-						similarity.
-					</div>
-					<div class="value">{{ iscc.content_id.code }}</div>
-				</div>
-				<div class="id" id="dataID"><span>Data-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">Generated from the formated text in the editor. Encodes raw data similarity.</div>
-					<div class="value">{{ iscc.data_id.code }}</div>
-				</div>
-				<div class="id" id="instanceID"><span>Instance-ID</span> <img class="help-icon" src="../images/question.svg">
-					<div class="help-text">Generated from the formated text in the editor. A checksum used for data integrity.</div>
-					<div class="value">{{ iscc.instance_id.code }}</div>
-				</div>
-			</section>
-		</div>
-		<div class="right">
-			<section id="log">
-				<div class="heading">
-					<div class="heading-text">
-						<span>Log </span>
-						<img class="help-icon" src="../images/question.svg">
-						<div class="help-text">
-							Every time you generate an ISCC a new Log entry is created for you.<br>
-							It shows the decoded raw bits of the ISCC one line per component.<br>
-							If you change the data in the the form and generate a new ISCC the Log will also show which bits are
-							affected by your change of data.
+			<div class="right">
+				<section id="log">
+					<div class="heading">
+						<div class="heading-text">
+							<span>Log </span>
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">
+								Every time you generate an ISCC a new Log entry is created for you.<br>
+								It shows the decoded raw bits of the ISCC one line per component.<br>
+								If you change the data in the the form and generate a new ISCC the Log will also show which bits are
+								affected by your change of data.
+							</div>
 						</div>
+						<button type="button" v-on:click="clearLog" :disabled="log.length == 0">Clear Log</button>
 					</div>
-					<button type="button" v-on:click="clearLog" :disabled="log.length == 0">Clear Log</button>
-				</div>
-				<div class="logEntries">
-					<div v-for="entry, key in log" class="logEntry">
-						<input type="checkbox" name="flip" :id="'entry' + key">
-						<label class="flip" :for="'entry' + key"></label>
-						<div class="date">{{ entry.time }}</div>
-						<div class="iscc">
-							<span title="Meta-ID">{{ entry.iscc.meta_id.code }}</span> -
-							<span title="Content-ID">{{ entry.iscc.content_id.code }}</span> -
-							<span title="Data-ID">{{ entry.iscc.data_id.code }}</span> -
-							<span title="Instance-ID">{{ entry.iscc.instance_id.code }}</span>
-						</div>
-						<div class="flipper">
-							<div class="front">
-								<div class="row">
-									<div class="label" data-id="metaID">
-										Meta-ID
-									</div>
-									<div class="bits" :data-sim="entry.sim.meta_id">
+					<div class="logEntries">
+						<div v-for="entry, key in log" class="logEntry">
+							<input type="checkbox" name="flip" :id="'entry' + key">
+							<label class="flip" :for="'entry' + key"></label>
+							<div class="date">{{ entry.time }}</div>
+							<div class="iscc">
+								<span title="Meta-ID">{{ entry.iscc.meta_id.code }}</span> -
+								<span title="Content-ID">{{ entry.iscc.content_id.code }}</span> -
+								<span title="Data-ID">{{ entry.iscc.data_id.code }}</span> -
+								<span title="Instance-ID">{{ entry.iscc.instance_id.code }}</span>
+							</div>
+							<div class="flipper">
+								<div class="front">
+									<div class="row">
+										<div class="label" data-id="metaID">
+											Meta-ID
+										</div>
+										<div class="bits" :data-sim="entry.sim.meta_id">
 										<span v-for="bit, bitKey in entry.iscc.meta_id.bits"
-													:class="{diff: entry.diff && !entry.diff.meta_id[bitKey]}">{{ bit }}</span>
+											  :class="{diff: entry.diff && !entry.diff.meta_id[bitKey]}">{{ bit }}</span>
+										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="label" data-id="contentID">
-										Content-ID
-									</div>
-									<div class="bits" :data-sim="entry.sim.content_id">
+									<div class="row">
+										<div class="label" data-id="contentID">
+											Content-ID
+										</div>
+										<div class="bits" :data-sim="entry.sim.content_id">
 										<span v-for="bit, bitKey in entry.iscc.content_id.bits"
-													:class="{diff: entry.diff && !entry.diff.content_id[bitKey]}">{{ bit }}</span>
+											  :class="{diff: entry.diff && !entry.diff.content_id[bitKey]}">{{ bit }}</span>
+										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="label" data-id="dataID">
-										Data-ID
-									</div>
-									<div class="bits" :data-sim="entry.sim.data_id">
+									<div class="row">
+										<div class="label" data-id="dataID">
+											Data-ID
+										</div>
+										<div class="bits" :data-sim="entry.sim.data_id">
 										<span v-for="bit, bitKey in entry.iscc.data_id.bits"
-													:class="{diff: entry.diff && !entry.diff.data_id[bitKey]}">{{ bit }}</span>
+											  :class="{diff: entry.diff && !entry.diff.data_id[bitKey]}">{{ bit }}</span>
+										</div>
 									</div>
-								</div>
-								<div class="row">
-									<div class="label" data-id="instanceID">
-										Instance-ID
-									</div>
-									<div class="bits" :data-sim="entry.sim.instance_id">
+									<div class="row">
+										<div class="label" data-id="instanceID">
+											Instance-ID
+										</div>
+										<div class="bits" :data-sim="entry.sim.instance_id">
 										<span v-for="bit, bitKey in entry.iscc.instance_id.bits"
-													:class="{diff: entry.diff && !entry.diff.instance_id[bitKey]}">{{ bit }}</span>
+											  :class="{diff: entry.diff && !entry.diff.instance_id[bitKey]}">{{ bit }}</span>
+										</div>
 									</div>
 								</div>
-							</div>
-							<div class="back">
-								<div class="title">Title: {{ entry.title }}</div>
-								<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators }}</div>
-								<label class="text"><input type="checkbox">
-									<div class="short"
+								<div class="back">
+									<div class="title">Title: {{ entry.title }}</div>
+									<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators }}</div>
+									<label class="text"><input type="checkbox">
+										<div class="short"
 											 v-html="entry.text.substring(0, 100) + (entry.text.length > 100 ? '...' : '')"></div>
-									<div class="long" v-html="entry.text"></div>
-								</label>
+										<div class="long" v-html="entry.text"></div>
+									</label>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</section>
+				</section>
+			</div>
+		</div>
+		<div id="footer">
+			<span>
+				This dummy is work in progress. Its purpose is to give you an impression of how our rights modules work. Please feel free to give us
+				<b><a href="https://content-blockchain.org/contact/">feedback</a></b>!
+			</span>
+
+			<br><br>
+			<a href="https://rightsprofiledemo.content-blockchain.org/validator.php" target="_blank">Rights Profile Validator</a>  |
+			<a href="https://isccdemo.content-blockchain.org/" target="_blank">ISCC Demo</a>  |
+			<a href="https://github.com/coblo/rights-profile-tool" target="_blank">Source Code</a>  |  Copyright © 2017 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
 		</div>
 	</div>
+
 </template>
 <script>
 import config from '../../config.js'
@@ -366,6 +380,22 @@ body {
 	font-family: 'Helvetica Neue', sans-serif;
 	font-size: 16px;
 	padding: .5rem;
+}
+
+#footer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: 20px 40px;
+
+	& span {
+		color: #3f51b5;
+	}
+
+	& a {
+		text-decoration: none;
+	}
 }
 
 [required].error {
