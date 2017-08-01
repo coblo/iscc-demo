@@ -1,4 +1,6 @@
 <template>
+	<h1>ISCC Web Demo v0.1</h1>
+	<h2>Creating ISCC identifiers for text content.</h2>
 	<div>
 		<div id="main-wrapper">
 			<div class="left">
@@ -355,6 +357,14 @@ pre {
 
 h1,h2,h3,h4,h5,h6 {
 	padding: .2rem 0 .5rem 0;
+}
+
+h1 {
+	font-size: 24px;
+}
+
+h2 {
+	font-size: 17px;
 }
 
 p {
