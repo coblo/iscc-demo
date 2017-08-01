@@ -883,8 +883,6 @@ section {
 		}
 	}
 	#result {
-		flex-flow: row;
-
 		& .heading {
 			flex-basis: 100%;
 		}
