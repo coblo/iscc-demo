@@ -172,14 +172,13 @@
 		</div>
 		<div id="footer">
 			<span>
-				This dummy is work in progress. Its purpose is to give you an impression of how our rights modules work. Please feel free to give us
+				This demo is work in progress. Its purpose is to give you an impression how the ISCC identifier works. Please feel free to give us
 				<b><a href="https://content-blockchain.org/contact/">feedback</a></b>!
 			</span>
 
 			<br><br>
-			<a href="https://rightsprofiledemo.content-blockchain.org/validator.php" target="_blank">Rights Profile Validator</a>  |
-			<a href="https://isccdemo.content-blockchain.org/" target="_blank">ISCC Demo</a>  |
-			<a href="https://github.com/coblo/rights-profile-tool" target="_blank">Source Code</a>  |  Copyright © 2017 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
+			<a href="https://rightsprofiledemo.content-blockchain.org/" target="_blank">Rights Profile Demo</a>  |
+			<a href="https://github.com/coblo/iscc-demo" target="_blank">Source Code</a>  |  Copyright © 2017 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
 		</div>
 	</div>
 
