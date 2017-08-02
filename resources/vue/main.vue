@@ -177,10 +177,10 @@
 				This demo is work in progress. Its purpose is to give you an impression how the ISCC identifier works. Please feel free to give us
 				<b><a href="https://content-blockchain.org/contact/">feedback</a></b>!
 			</span>
-
-			<br><br>
-			<a href="https://rightsprofiledemo.content-blockchain.org/" target="_blank">Rights Profile Demo</a>  |
-			<a href="https://github.com/coblo/iscc-demo" target="_blank">Source Code</a>  |  Copyright © 2017 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
+			<br>
+			<br>
+			<a href="https://rightsprofiledemo.content-blockchain.org/" target="_blank">Rights Profile Demo</a> |
+			<a href="https://github.com/coblo/iscc-demo" target="_blank">Source Code</a> | Copyright © 2017 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
 		</div>
 	</div>
 
@@ -339,6 +339,27 @@ export default{
 @import 'https://fonts.googleapis.com/css?family=Roboto';
 @import '../../node_modules/trix/dist/trix.css';
 
+html, body {
+	padding: 0;
+	margin: 0;
+}
+
+html {
+	height: 100%;
+}
+
+body {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+body > div {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
 * {
 	box-sizing: border-box;
 	vertical-align: top;
@@ -392,8 +413,7 @@ body {
 }
 
 #footer {
-	width: 100%;
-	padding: 20px 40px;
+	padding: 2rem 5rem;
 
 	& span {
 		color: #3f51b5;
@@ -401,6 +421,7 @@ body {
 
 	& a {
 		text-decoration: none;
+		font-weight: 600;
 	}
 }
 
@@ -448,6 +469,7 @@ section {
 }
 
 #main-wrapper {
+	flex: 1;
 	display: flex;
 	flex-direction: column;
 }
