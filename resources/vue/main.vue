@@ -1,93 +1,120 @@
 <template>
 	<div>
-		<h1>ISCC Web Demo v0.1</h1>
+		<h1>ISCC Web Demo v1.0.5</h1>
 		<h2>Creating ISCC identifiers for text content</h2>
 		<div id="main-wrapper">
 			<div class="left">
 				<section id="input-data">
-					<div id="meta-data">
-						<div class="heading">Meta-Data</div>
-						<div class="title">
-							<label for="meta-text">Title
-								<img class="help-icon" src="../images/question.svg">
-								<div class="help-text">
-									The title of your content will be used to create the Meta-ID component of the final ISCC.<br>
-									This is the only required field to create a valid Meta-ID component.<br>
-									Similar title information will create Meta-IDs that are also similar.
-								</div>
-							</label>
-							<input id="meta-text" v-on:input="entryDataChanged = true;" v-on:paste="entryDataChanged = true;"
-								   type="text" v-model="metaData.title" autofocus/>
-						</div>
-						<div class="creators">
-							<label>Creators
-								<img class="help-icon" src="../images/question.svg">
-								<div class="help-text">
-									List the main creators of the content here.<br>
-									Different ways to write a creator´s name will generate identical or similar Meta-IDs.<br>
-									To see how the Meta-ID stays the same, generate separate ISCC with these variations in the creators
-									field:
-									<ul>
-										<li>Dorian Gray</li>
-										<li>D. Gray</li>
-										<li>Gray, Dorian</li>
-									</ul>
-								</div>
-							</label>
-							<div v-for="creator, key in metaData.creators" class="creator">
-								<input type="text" v-model="metaData.creators[key]" v-on:input="entryDataChanged = true;"
-									   v-on:paste="entryDataChanged = true;" :ref="'creator' + key">
-								<div class="close" v-on:click="removeCreator(key)">&#10006;</div>
-							</div>
-							<button type="button" v-on:click="addCreator"></button>
-						</div>
+					<div class="heading">Content</div>
+					<div id="radio-buttons">
+						<label><input type="radio" v-model="generateFrom" value="file"> Generate from File</label>
+						<label><input type="radio" v-model="generateFrom" value="url"> Generate from URL</label>
 					</div>
-					<div id="text">
-						<div class="heading">Texteditor
-							<img class="help-icon" src="../images/question.svg">
-							<div class="help-text">
-								Put your text content here.<br>
-								The Content-ID, Data-ID and Instance-ID are created from this.<br>
-								Different kinds of changes will affect differents parts of the ISCC code.<br>
-								For example if you just change a word to bold in the text, it will:
-								<ul>
-									<li>not change the Meta-ID</li>
-									<li>not change the Content-ID</li>
-									<li>small change to Data-ID</li>
-									<li>big change to Instance-ID</li>
-								</ul>
+
+					<div
+						v-if="generateFrom === 'file'"
+						id="drag-field"
+						:class="{'file-dragged': localFileDragged}"
+						@dragenter.prevent.stop="localFileDragged = true"
+						@dragover.prevent.stop="localFileDragged = true"
+						@dragleave.prevent.stop="localFileDragged = false"
+						@drop.prevent.stop="localFileDropped"
+					>
+						<div v-if="fileStatus === 'missing'">
+							You can drag a file here<br>or<br>use the button below
+						</div>
+						<div v-else-if="fileStatus === 'loading'">
+							Uploading file...
+						</div>
+						<div v-else-if="fileStatus === 'generating'">
+							Generating ISCC...
+						</div>
+						<div v-else class="file">{{ file }}</div>
+					</div>
+
+					<label v-if="generateFrom === 'file'" class="upload-button">
+						<span class="button">Upload file</span>
+						<input type="file" @change="readFileData">
+					</label>
+
+					<form v-if="generateFrom === 'url'" class="from-url" @submit.prevent="generateISCCFromUrl">
+						<label>
+							URL:
+							<input type="text" v-model="url">
+						</label>
+						<input type="submit" value="Generate From URL" class="button" />
+					</form>
+
+					<div v-if="showMetaData" class="heading">Meta-Data</div>
+					<div id="meta-data" v-if="showMetaData">
+						<div class="meta-data-wrapper">
+							<div class="title">
+								<label for="meta-text">
+									Title
+									<div class="help-wrapper">
+										<img class="help-icon" src="../images/question.svg">
+										<div class="help-text">
+											The title of your content will be used to create the Meta-ID component of the final ISCC.<br>
+											This is the only required field to create a valid Meta-ID component.<br>
+											Similar title information will create Meta-IDs that are also similar.
+										</div>
+									</div>
+								</label>
+								<input id="meta-text" type="text" v-model="metaData.title" autofocus/>
+							</div>
+
+							<div class="extra">
+								<label for="extra-text">
+									Extra
+									<div class="help-wrapper">
+										<img class="help-icon" src="../images/question.svg">
+										<div class="help-text">
+											The extra of the content here.
+										</div>
+									</div>
+								</label>
+								<input id="extra-text" type="text" v-model="metaData.extra"/>
 							</div>
 						</div>
-						<input id="x" type="hidden" ref="editorText">
-						<trix-editor class="editor-content" v-on:input="entryDataChanged = true;"
-									 v-on:paste="entryDataChanged = true;" input="x"></trix-editor>
+						<button type="button" class="generate-button" @click="generateMetaID">Regenerate Meta ID</button>
 					</div>
 				</section>
-				<div id="generate">
-					<button type="button" :disabled="!entryDataChanged || !metaData.title" class="generate-button"
-							v-on:click="generate">
-						Generate ISCC
-					</button>
-				</div>
+
 				<section id="result">
 					<div class="heading">ISCC</div>
-					<div class="id" id="metaID"><span>Meta-ID</span> <img class="help-icon" src="../images/question.svg">
-						<div class="help-text">Generated from Title and Creators fields. Encodes similarity of Metadata.</div>
+					<div class="id" id="metaID">
+						<span>Meta-ID</span>
+						<div class="help-wrapper">
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">Generated from Title and extra fields. Encodes similarity of Metadata.</div>
+						</div>
 						<div class="value">{{ iscc.meta_id.code }}</div>
 					</div>
-					<div class="id" id="contentID"><span>Content-ID</span> <img class="help-icon" src="../images/question.svg">
-						<div class="help-text">
-							Generated from the extracted plain text content without text formatting. Encodes structural content
-							similarity.
+					<div class="id" id="contentID">
+						<span>Content-ID</span>
+						<div class="help-wrapper">
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">
+								Generated from the extracted plain text content without text formatting. Encodes structural content
+								similarity.
+							</div>
 						</div>
 						<div class="value">{{ iscc.content_id.code }}</div>
 					</div>
-					<div class="id" id="dataID"><span>Data-ID</span> <img class="help-icon" src="../images/question.svg">
-						<div class="help-text">Generated from the formated text in the editor. Encodes raw data similarity.</div>
+					<div class="id" id="dataID">
+						<span>Data-ID</span>
+						<div class="help-wrapper">
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">Generated from the formated text in the editor. Encodes raw data similarity.</div>
+						</div>
 						<div class="value">{{ iscc.data_id.code }}</div>
 					</div>
-					<div class="id" id="instanceID"><span>Instance-ID</span> <img class="help-icon" src="../images/question.svg">
-						<div class="help-text">Generated from the formated text in the editor. A checksum used for data integrity.</div>
+					<div class="id" id="instanceID">
+						<span>Instance-ID</span>
+						<div class="help-wrapper">
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">Generated from the formated text in the editor. A checksum used for data integrity.</div>
+						</div>
 						<div class="value">{{ iscc.instance_id.code }}</div>
 					</div>
 				</section>
@@ -97,18 +124,20 @@
 					<div class="heading">
 						<div class="heading-text">
 							<span>Log </span>
-							<img class="help-icon" src="../images/question.svg">
-							<div class="help-text">
-								Every time you generate an ISCC a new Log entry is created for you.<br>
-								It shows the decoded raw bits of the ISCC one line per component.<br>
-								If you change the data in the the form and generate a new ISCC the Log will also show which bits are
-								affected by your change of data.
+							<div class="help-wrapper">
+								<img class="help-icon" src="../images/question.svg">
+								<div class="help-text">
+									Every time you generate an ISCC a new Log entry is created for you.<br>
+									It shows the decoded raw bits of the ISCC one line per component.<br>
+									If you change the data in the the form and generate a new ISCC the Log will also show which bits are
+									affected by your change of data.
+								</div>
 							</div>
 						</div>
-						<button type="button" v-on:click="clearLog" :disabled="log.length == 0">Clear Log</button>
+						<button type="button" @click="clearLog" :disabled="log.length === 0">Clear Log</button>
 					</div>
 					<div class="logEntries">
-						<div v-for="entry, key in log" class="logEntry">
+						<div v-for="(entry, key) in log" class="logEntry">
 							<input type="checkbox" name="flip" :id="'entry' + key">
 							<label class="flip" :for="'entry' + key"></label>
 							<div class="date">{{ entry.time }}</div>
@@ -125,7 +154,7 @@
 											Meta-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.meta_id">
-										<span v-for="bit, bitKey in entry.iscc.meta_id.bits"
+										<span v-for="(bit, bitKey) in entry.iscc.meta_id.bits"
 											  :class="{diff: entry.diff && !entry.diff.meta_id[bitKey]}">{{ bit }}</span>
 										</div>
 									</div>
@@ -134,7 +163,7 @@
 											Content-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.content_id">
-										<span v-for="bit, bitKey in entry.iscc.content_id.bits"
+										<span v-for="(bit, bitKey) in entry.iscc.content_id.bits"
 											  :class="{diff: entry.diff && !entry.diff.content_id[bitKey]}">{{ bit }}</span>
 										</div>
 									</div>
@@ -143,7 +172,7 @@
 											Data-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.data_id">
-										<span v-for="bit, bitKey in entry.iscc.data_id.bits"
+										<span v-for="(bit, bitKey) in entry.iscc.data_id.bits"
 											  :class="{diff: entry.diff && !entry.diff.data_id[bitKey]}">{{ bit }}</span>
 										</div>
 									</div>
@@ -152,19 +181,18 @@
 											Instance-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.instance_id">
-										<span v-for="bit, bitKey in entry.iscc.instance_id.bits"
+										<span v-for="(bit, bitKey) in entry.iscc.instance_id.bits"
 											  :class="{diff: entry.diff && !entry.diff.instance_id[bitKey]}">{{ bit }}</span>
 										</div>
 									</div>
 								</div>
 								<div class="back">
 									<div class="title">Title: {{ entry.title }}</div>
-									<div v-if="entry.creators.length > 0" class="title">Creators: {{ entry.creators }}</div>
-									<label class="text"><input type="checkbox">
-										<div class="short"
-											 v-html="entry.text.substring(0, 100) + (entry.text.length > 100 ? '...' : '')"></div>
-										<div class="long" v-html="entry.text"></div>
-									</label>
+									<div v-if="entry.extra" class="title">Extra: {{ entry.extra }}</div>
+									<div v-if="entry.file !== null">File: {{ file }}</div>
+									<div v-if="entry.url !== null">URL: {{ url }}</div>
+									<div>Tophash: {{ entry.iscc.tophash }}</div>
+									<div>GMT: {{ entry.iscc.gmt }}</div>
 								</div>
 							</div>
 						</div>
@@ -180,131 +208,96 @@
 			<br>
 			<br>
 			<a href="https://rightsprofiledemo.content-blockchain.org/" target="_blank">Rights Profile Demo</a> |
-			<a href="https://github.com/coblo/iscc-demo" target="_blank">Source Code</a> | Copyright © 2017 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
+			<a href="https://github.com/coblo/iscc-demo" target="_blank">Source Code</a> | Copyright © 2017 - 2020 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
 		</div>
 	</div>
 
 </template>
 <script>
 import config from '../../config.js'
-import trix from 'trix'
-import Vue from 'vue'
 
 export default{
 	data: function() {
 		return {
 			iscc: {
 				meta_id: {
-					code: '-'
+					code: '-',
+					bits: 0
 				},
 				content_id: {
-					code: '-'
+					code: '-',
+					bits: 0
 				},
 				data_id: {
-					code: '-'
+					code: '-',
+					bits: 0
 				},
 				instance_id: {
-					code: '-'
+					code: '-',
+					bits: 0
 				}
 			},
 			metaData: {
 				title: '',
-				creators: []
+				extra: ''
 			},
 			text: '',
 			log: [],
-			entryDataChanged: false
+			entryDataChanged: false,
+			localFileDragged: false,
+			file: false,
+			fileStatus: 'missing',
+			generateFrom: 'file',
+			url: '',
+			showMetaData: false,
 		}
 	},
+	watch: {
+		generateFrom(val) {
+			this.file = false;
+			this.fileStatus = 'missing';
+			this.url = '';
+			this.metaData = {
+				title: '',
+				extra: ''
+			};
+			this.iscc = {
+				meta_id: {
+					code: '-',
+					bits: 0
+				},
+				content_id: {
+					code: '-',
+					bits: 0
+				},
+				data_id: {
+					code: '-',
+					bits: 0
+				},
+				instance_id: {
+					code: '-',
+					bits: 0
+				}
+			};
+			this.showMetaData = false;
+		},
+	},
 	methods: {
-		generate: function () {
-			let that = this;
-			let iscc = [];
-			this.entryDataChanged = false;
+		generateMetaID() {
+			this.$http.post(config.apiUrl + '/generate/meta_id/', {
+				title: this.metaData.title,
+				extra: (this.metaData.extra ? this.metaData.extra : ' '),
+			}).then(({body: {code, bits}}) => {
+				this.iscc.meta_id.code = code;
+				this.iscc.meta_id.bits = bits;
 
-			// to get the raw text we add the html to a tmp div and read the text
-			let htmlText = this.$refs.editorText.value;
-			let tmp = document.createElement('div');
-			tmp.innerHTML = htmlText;
-			let rawText = tmp.innerText;
-
-			// get last logentry
-			let lastBits = false;
-			if (this.log.length > 0) {
-				lastBits = this.log[this.log.length - 1];
-			}
-
-			this.$http.post(config.apiUrl + '/generate/meta_id', {
-				'title': this.metaData.title,
-				'creators': this.metaData.creators.join(';')
-			}).then((response) => {
-				iscc.meta_id = response.body.meta_id;
-
-				this.$http.post(config.apiUrl + '/generate/content_id_text', {'text': rawText}).then((response) => {
-					iscc.content_id = response.body.content_id;
-
-					this.$http.post(config.apiUrl + '/generate/data_instance_id', htmlText || ' ', {
-						headers: {
-								'Content-Type': 'application/octet-stream'
-						}
-					}).then((response) => {
-						iscc.data_id = response.body.data_id;
-						iscc.instance_id = response.body.instance_id;
-
-						let d = new Date();
-						let timeStamp = d.getFullYear() + '-' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate() + ' ' + d.toTimeString().substring(0, 8);
-
-						let differences = false;
-						let similarity = {
-							meta_id: 100,
-							content_id: 100,
-							data_id: 100,
-							instance_id: 100
-						}
-						if (lastBits) {
-							differences = {
-								meta_id: that.diffArray(iscc.meta_id.bits, lastBits.iscc.meta_id.bits),
-								content_id: that.diffArray(iscc.content_id.bits, lastBits.iscc.content_id.bits),
-								data_id: that.diffArray(iscc.data_id.bits, lastBits.iscc.data_id.bits),
-								instance_id: that.diffArray(iscc.instance_id.bits, lastBits.iscc.instance_id.bits)
-							};
-							similarity = {
-								meta_id: that.jaccard_sim(differences.meta_id),
-								content_id: that.jaccard_sim(differences.content_id),
-								data_id: that.jaccard_sim(differences.data_id),
-								instance_id: that.jaccard_sim(differences.instance_id)
-							};
-						}
-
-						that.iscc = iscc;
-						that.log.push({
-							iscc: iscc,
-							time: timeStamp,
-							title: that.metaData.title,
-							creators: that.metaData.creators.join('; '),
-							text: htmlText,
-							diff: differences,
-							sim: similarity
-						});
-					})
-				})
-			})
-		},
-		addCreator: function () {
-			this.metaData.creators.push('');
-			var that = this;
-			Vue.nextTick(function() {
-				that.$refs['creator' + (that.metaData.creators.length - 1)][0].focus();
-			})
-			this.entryDataChanged = true;
-		},
-		removeCreator: function (key) {
-			this.metaData.creators.splice(key, 1);
+				this.pushToLog();
+			});
 		},
 		diffArray: function(arr1, arr2) {
 			let diff = [];
 			for (let i = 0; i < arr1.length; ++i) {
-				diff.push(arr1[i] == arr2[i]);
+				diff.push(arr1[i] === arr2[i]);
 			}
 			return diff;
 		},
@@ -318,26 +311,139 @@ export default{
 			if (confirm('Really clear log?')) {
 				this.log = [];
 			}
-		}
-	},
-	mounted: function () {
-		let that = this;
-		let trixButtonsWrapper = document.getElementById('trix-toolbar-1');
-		let trixButtons = trixButtonsWrapper.getElementsByTagName('button');
+		},
+		localFileDropped($event) {
+			this.localFileDragged = false;
 
-		for (let i = 0; i < trixButtons.length; ++i) {
-			trixButtons[i].addEventListener("click", function () {
-				that.entryDataChanged = true;
-			})
-		}
-	}
+			if ($event.dataTransfer.files && $event.dataTransfer.files[0])
+			{
+				this.fileStatus = 'loading';
+				this.generateISCCFromFile($event.dataTransfer.files[0]);
+			}
+			// todo: catch else
+		},
+		readFileData($event) {
+			if ($event.target.files && $event.target.files[0])
+			{
+				this.fileStatus = 'loading';
+				this.generateISCCFromFile($event.target.files[0]);
+			}
+			// todo: catch else
+		},
+		generateISCCFromFile(file) {
+			this.fileStatus = 'generating';
+
+			let formData = new FormData();
+			formData.append('file', file);
+
+			// if file type is image meta data is needed
+			if (file.type.indexOf('image/') === 0)
+				formData.append('title', file.name);
+
+			this.$http.post(config.apiUrl + '/generate/from_file', formData, {
+				emulateJSON: true,
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}).then(({body: {iscc, tophash, gmt, bits, title, extra}}) => {
+				this.file = file.name;
+				this.fileStatus = file.name;
+
+				let isccParts = iscc.split('-');
+				this.iscc.meta_id.code = isccParts[0];
+				this.iscc.content_id.code = isccParts[1];
+				this.iscc.data_id.code = isccParts[2];
+				this.iscc.instance_id.code = isccParts[3];
+
+				this.iscc.meta_id.bits = bits[0];
+				this.iscc.content_id.bits = bits[1];
+				this.iscc.data_id.bits = bits[2];
+				this.iscc.instance_id.bits = bits[3];
+
+				this.iscc.tophash = tophash;
+				this.iscc.gmt = gmt;
+
+				this.metaData.title = title === undefined ? file.name : title;
+				this.metaData.extra = extra === undefined ? '' : extra;
+
+				this.pushToLog();
+			});
+		},
+		generateISCCFromUrl() {
+			// todo: catch to show error
+			this.$http.post(config.apiUrl + '/generate/from_url?url=' + this.url).then(({body: {iscc, title, extra, tophash, gmt, bits}}) => {
+				let isccParts = iscc.split('-');
+				this.iscc.meta_id.code = isccParts[0];
+				this.iscc.content_id.code = isccParts[1];
+				this.iscc.data_id.code = isccParts[2];
+				this.iscc.instance_id.code = isccParts[3];
+
+				this.iscc.meta_id.bits = bits[0];
+				this.iscc.content_id.bits = bits[1];
+				this.iscc.data_id.bits = bits[2];
+				this.iscc.instance_id.bits = bits[3];
+
+				this.iscc.tophash = tophash;
+				this.iscc.gmt = gmt;
+
+				this.metaData.title = title !== null ? title : this.url;
+				this.metaData.extra = extra !== null ? extra : '';
+
+				this.pushToLog();
+			});
+		},
+		pushToLog() {
+			this.showMetaData = true;
+
+			let lastBits = false;
+			if (this.log.length > 0) {
+				lastBits = this.log[this.log.length - 1];
+			}
+
+			let d = new Date();
+			let timeStamp = d.getFullYear() + '-' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate() + ' ' + d.toTimeString().substring(0, 8);
+
+			let differences = false;
+			let similarity = {
+				meta_id: 100,
+				content_id: 100,
+				data_id: 100,
+				instance_id: 100
+			};
+
+			if (lastBits) {
+				differences = {
+					meta_id: this.diffArray(this.iscc.meta_id.bits, lastBits.iscc.meta_id.bits),
+					content_id: this.diffArray(this.iscc.content_id.bits, lastBits.iscc.content_id.bits),
+					data_id: this.diffArray(this.iscc.data_id.bits, lastBits.iscc.data_id.bits),
+					instance_id: this.diffArray(this.iscc.instance_id.bits, lastBits.iscc.instance_id.bits)
+				};
+				similarity = {
+					meta_id: this.jaccard_sim(differences.meta_id),
+					content_id: this.jaccard_sim(differences.content_id),
+					data_id: this.jaccard_sim(differences.data_id),
+					instance_id: this.jaccard_sim(differences.instance_id)
+				};
+			}
+
+			this.log.push({
+				iscc: JSON.parse(JSON.stringify(this.iscc)),
+				time: timeStamp,
+				title: this.metaData.title,
+				extra: this.metaData.extra,
+				diff: differences,
+				file: this.generateFrom === 'file' ? this.file : null,
+				url: this.generateFrom === 'url' ? this.url : null,
+				sim: similarity,
+			});
+		},
+	},
 }
 
 
 </script>
 <style>
 @import 'https://fonts.googleapis.com/css?family=Roboto';
-@import '../../node_modules/trix/dist/trix.css';
 
 html, body {
 	padding: 0;
@@ -449,22 +555,32 @@ section {
 	}
 }
 
-.help-icon {
+.help-wrapper {
+	position: relative;
 	display: inline-block;
-	width: 1rem;
-	cursor: pointer;
 
-	& + .help-text {
-		display: none;
-		padding: 3px;
-		border: 1px solid #444;
-		background: #fff;
-		border-radius: 6px;
-		font-size: .8rem;
-	}
+	& .help-icon {
+		display: inline-block;
+		width: 1rem;
+		cursor: pointer;
 
-	&:hover + .help-text {
-		 display: block;
+		& + .help-text {
+			display: none;
+			position: absolute;
+			width: 8rem;
+			text-align: left;
+			padding: 3px;
+			border: 1px solid #444;
+			background: #fff;
+			border-radius: 6px;
+			font-size: .8rem;
+			bottom: 1.5rem;
+			z-index: 2;
+		}
+
+		&:hover + .help-text {
+			display: block;
+		}
 	}
 }
 
@@ -481,12 +597,24 @@ section {
 
 #meta-data {
 	width: 100%;
+	display: flex;
+	align-items: center;
+
+	& .meta-data-wrapper {
+		flex: 1;
+	}
+
+	& > button {
+		margin-left: 1rem;
+		padding: 7px 15px;
+		font-size: 1rem;
+	}
 
 	& .title {
 		margin-bottom: 1rem;
 	}
 
-	& .title, & .creators {
+	& .title, & .extra {
 		display: flex;
 		align-items: stretch;
 		flex-flow: row wrap;
@@ -503,15 +631,6 @@ section {
 			flex-direction: row;
 			align-items: center;
 			justify-content: space-between;
-
-			& .help-text {
-				position: absolute;
-				left: 100%;
-				top: 50%;
-				transform: translate(.5rem, -50%);
-				white-space: nowrap;
-				z-index: 1;
-			}
 		}
 
 		& input {
@@ -519,26 +638,6 @@ section {
 			flex: 1;
 			background: #eee;
 			margin-right: .5rem;
-		}
-
-		& .creator {
-			position: relative;
-			margin-bottom: .5rem;
-			display: flex;
-
-			& input {
-				padding: .5rem 1.6rem .5rem .5rem;
-			}
-
-			& .close {
-				position: absolute;
-				right: 1rem;
-				top: 50%;
-				transform: translateY(-50%);
-				cursor: pointer;
-				font-size: 0.8rem;
-				line-height: 0;
-			}
 		}
 
 		& button {
@@ -555,62 +654,6 @@ section {
 				content: '+';
 			}
 		}
-	}
-
-	& .creators {
-		padding-bottom: 0;
-
-		& label {
-			margin-bottom: .5rem;
-		}
-	}
-
-}
-
-#text {
-	flex-basis: 100%;
-	display: flex;
-	flex-direction: column;
-	margin-top: 2rem;
-	width: 100%;
-
-	& .heading {
-		flex: none;
-		display: flex;
-		align-items: center;
-		position: relative;
-
-		& .help-icon,
-		& .help-text {
-			margin-left: .3rem;
-		}
-		& .help-text {
-			position: absolute;
-			z-index: 1;
-			top: 100%;
-		}
-	}
-
-	& .editor-content {
-		background-color: #fff;
-		overflow-y: auto;
-		max-height: 12rem;
-	}
-}
-
-#trix-toolbar-1 {
-	& .button_row {
-		justify-content: flex-start;
-
-		& .button_group {
-			margin-right: 1rem;
-		}
-	}
-	& button {
-		background-color: #fff;
-	}
-	& button.active {
-		background-color: #cbeefa;
 	}
 }
 
@@ -631,20 +674,6 @@ section {
 		flex: 1;
 		text-align: center;
 		padding: .5rem 0;
-
-		& .help-icon {
-			& + .help-text {
-				position: absolute;
-				top: -.5rem;
-				left: 0;
-				width: 100%;
-				-webkit-transform: translateY(-100%);
-				-moz-transform: translateY(-100%);
-				-ms-transform: translateY(-100%);
-				-o-transform: translateY(-100%);
-				transform: translateY(-100%);
-			}
-		}
 
 		& .value {
 			margin-top: 1rem;
@@ -680,16 +709,9 @@ section {
 		justify-content: space-between;
 		position: relative;
 
-		& .heading-text {
-			& .help-icon,
-			& .help-text {
-				margin-left: .3rem;
-			}
-			& .help-text {
-				position: absolute;
-				z-index: 1;
-				top: 100%;
-			}
+		& .help-text {
+			left: 1rem;
+			bottom: auto;
 		}
 
 		& button {
@@ -871,6 +893,82 @@ section {
 	}
 }
 
+#drag-field {
+	background: #fff;
+	text-align: center;
+	line-height: 2rem;
+	position: relative;
+	width: 100%;
+	height: 160px;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: space-around;
+	margin-bottom: 1rem;
+
+	&.file-dragged:before {
+		content: '';
+		position: absolute;
+		left: 5px;
+		right: 5px;
+		top: 5px;
+		bottom: 5px;
+		border: 2px dashed lightblue;
+	}
+}
+
+.upload-button {
+	background: #cccccc;
+	padding: 7px 15px;
+	margin-left: 50%;
+	transform: translateX(-50%);
+	margin-bottom: 1rem;
+	cursor: pointer;
+}
+
+input[type="file"] {
+	display: none;
+}
+
+.from-url {
+	width: 100%;
+	display: flex;
+	margin-bottom: 2rem;
+
+	& label {
+		display: inline-flex;
+		align-items: center;
+		flex: 1;
+
+		& input[type="text"] {
+			padding: 7px 15px;
+			margin: 0 1rem;
+			flex: 1;
+		}
+	}
+
+	& .button {
+		background: #cccccc;
+		padding: 7px 15px;
+		cursor: pointer;
+	}
+}
+
+#radio-buttons {
+	display: flex;
+	margin-bottom: 1rem;
+
+	& > label {
+		display: flex;
+		align-items: center;
+		margin-right: 1rem;
+
+		& input {
+			margin-right: 5px;
+		}
+	}
+}
+
 @media (min-width: 1200px) {
 	#main-wrapper {
 		flex-direction: row;
@@ -903,16 +1001,6 @@ section {
 	}
 	section {
 		margin: 0;
-	}
-	#trix-toolbar-1 {
-		& .button_row {
-			& .button_group {
-				margin-right: .2rem;
-				& button {
-					width: 1.6em;
-				}
-			}
-		}
 	}
 	#result {
 		& .heading {
