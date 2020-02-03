@@ -199,6 +199,8 @@
 					</div>
 				</section>
 			</div>
+
+			<div v-if="error !== ''" class="error-text">Error:<br>{{ error }}</div>
 		</div>
 		<div id="footer">
 			<span>
@@ -250,6 +252,7 @@ export default{
 			generateFrom: 'file',
 			url: '',
 			showMetaData: false,
+			error: '',
 		}
 	},
 	watch: {
@@ -292,6 +295,8 @@ export default{
 				this.iscc.meta_id.bits = bits;
 
 				this.pushToLog();
+			}).catch(({body: {detail}}) => {
+				this.showError(detail[0]['msg']);
 			});
 		},
 		diffArray: function(arr1, arr2) {
@@ -315,12 +320,29 @@ export default{
 		localFileDropped($event) {
 			this.localFileDragged = false;
 
-			if ($event.dataTransfer.files && $event.dataTransfer.files[0])
+			if (!$event.dataTransfer.files)
 			{
-				this.fileStatus = 'loading';
-				this.generateISCCFromFile($event.dataTransfer.files[0]);
+				this.showError('Could not read file');
+				return;
 			}
-			// todo: catch else
+
+			let file = $event.dataTransfer.files[0];
+
+			if (!file)
+			{
+				this.showError('Could not read file');
+				return;
+			}
+
+			// check if dragged file is folder (folder have no type, have no '.' in name and have size 0)
+			if (file.type === '' && file.name.indexOf('.') === -1 && file.size === 0)
+			{
+				this.showError('Please select a file, not a folder');
+				return;
+			}
+
+			this.fileStatus = 'loading';
+			this.generateISCCFromFile(file);
 		},
 		readFileData($event) {
 			if ($event.target.files && $event.target.files[0])
@@ -328,7 +350,10 @@ export default{
 				this.fileStatus = 'loading';
 				this.generateISCCFromFile($event.target.files[0]);
 			}
-			// todo: catch else
+			else
+			{
+				this.showError('Could not read file');
+			}
 		},
 		generateISCCFromFile(file) {
 			this.fileStatus = 'generating';
@@ -367,10 +392,17 @@ export default{
 				this.metaData.extra = extra === undefined ? '' : extra;
 
 				this.pushToLog();
+			}).catch(({body: {detail}}) => {
+				this.showError(detail[0]['msg']);
 			});
 		},
 		generateISCCFromUrl() {
-			// todo: catch to show error
+			if (this.url === '')
+			{
+				this.showError('Please give a valid URL');
+				return;
+			}
+
 			this.$http.post(config.apiUrl + '/generate/from_url?url=' + this.url).then(({body: {iscc, title, extra, tophash, gmt, bits}}) => {
 				let isccParts = iscc.split('-');
 				this.iscc.meta_id.code = isccParts[0];
@@ -390,6 +422,8 @@ export default{
 				this.metaData.extra = extra !== null ? extra : '';
 
 				this.pushToLog();
+			}).catch(({body: {detail}}) => {
+				this.showError(detail[0]['msg']);
 			});
 		},
 		pushToLog() {
@@ -436,6 +470,10 @@ export default{
 				url: this.generateFrom === 'url' ? this.url : null,
 				sim: similarity,
 			});
+		},
+		showError(errorText) {
+			this.error = errorText;
+			setTimeout(() => { this.error = ''; }, 3000);
 		},
 	},
 }
@@ -1043,4 +1081,12 @@ input[type="file"] {
 	}
 }
 
+	.error-text {
+		position: fixed;
+		top: 1rem;
+		right: 1rem;
+		padding: 10px;
+		background: red;
+		color: #fff;
+	}
 </style>
