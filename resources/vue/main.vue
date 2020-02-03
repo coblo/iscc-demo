@@ -361,10 +361,6 @@ export default{
 			let formData = new FormData();
 			formData.append('file', file);
 
-			// if file type is image meta data is needed
-			if (file.type.indexOf('image/') === 0)
-				formData.append('title', file.name);
-
 			this.$http.post(config.apiUrl + '/generate/from_file', formData, {
 				emulateJSON: true,
 				headers: {
@@ -375,15 +371,33 @@ export default{
 				this.fileStatus = file.name;
 
 				let isccParts = iscc.split('-');
-				this.iscc.meta_id.code = isccParts[0];
-				this.iscc.content_id.code = isccParts[1];
-				this.iscc.data_id.code = isccParts[2];
-				this.iscc.instance_id.code = isccParts[3];
+				if (isccParts.length < 4)
+				{
+					this.iscc.content_id.code = isccParts[0];
+					this.iscc.data_id.code = isccParts[1];
+					this.iscc.instance_id.code = isccParts[2];
+				}
+				else
+				{
+					this.iscc.meta_id.code = isccParts[0];
+					this.iscc.content_id.code = isccParts[1];
+					this.iscc.data_id.code = isccParts[2];
+					this.iscc.instance_id.code = isccParts[3];
+				}
 
-				this.iscc.meta_id.bits = bits[0];
-				this.iscc.content_id.bits = bits[1];
-				this.iscc.data_id.bits = bits[2];
-				this.iscc.instance_id.bits = bits[3];
+				if (bits.length < 4)
+				{
+					this.iscc.content_id.bits = bits[0];
+					this.iscc.data_id.bits = bits[1];
+					this.iscc.instance_id.bits = bits[2];
+				}
+				else
+				{
+					this.iscc.meta_id.bits = bits[0];
+					this.iscc.content_id.bits = bits[1];
+					this.iscc.data_id.bits = bits[2];
+					this.iscc.instance_id.bits = bits[3];
+				}
 
 				this.iscc.tophash = tophash;
 				this.iscc.gmt = gmt;
@@ -391,9 +405,17 @@ export default{
 				this.metaData.title = title === undefined ? file.name : title;
 				this.metaData.extra = extra === undefined ? '' : extra;
 
-				this.pushToLog();
+				if (bits.length < 4)
+					this.generateMetaID();
+				else
+					this.pushToLog();
 			}).catch(({body: {detail}}) => {
-				this.showError(detail[0]['msg']);
+				if (typeof detail === 'object')
+					this.showError(detail[0]['msg']);
+				else
+					this.showError(detail);
+
+				this.fileStatus = 'missing';
 			});
 		},
 		generateISCCFromUrl() {
