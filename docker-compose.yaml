@@ -12,5 +12,7 @@ services:
       context: .
       dockerfile: .ci/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - iscc-service
     ports:
       - 8080:80
