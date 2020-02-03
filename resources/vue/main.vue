@@ -32,7 +32,7 @@
 						<div v-else class="file">{{ file }}</div>
 					</div>
 
-					<label v-if="generateFrom === 'file'" class="upload-button">
+					<label v-if="generateFrom === 'file'" class="upload-button button">
 						<span class="button">Upload file</span>
 						<input type="file" @change="readFileData">
 					</label>
@@ -496,12 +496,14 @@ body {
 	min-height: 100%;
 	display: flex;
 	flex-direction: column;
-}
+	font-size: 16px;
+	padding: .5rem;
 
-body > div {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
+	& > div {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
 }
 
 * {
@@ -511,17 +513,12 @@ body > div {
 	padding: 0;
 	border: none;
 	color: inherit;
-	font-family: roboto, sanserif;
+	font-family: roboto, sanserif, sans-serif;
 }
 
-pre {
-	font-family: monospace;
-	white-space: pre;
-	margin: 1em 0;
-}
-
-h1,h2,h3,h4,h5,h6 {
+h1, h2 {
 	padding: .2rem 0 .5rem 0;
+	margin-left: .5rem;
 }
 
 h1 {
@@ -532,28 +529,14 @@ h2 {
 	font-size: 17px;
 }
 
-p {
-	padding: .5rem 0
-}
-
-ul, ol {
-	padding: .5rem 0 .5rem 1.2rem;
-}
-
-hr {
-	border-top: 1px solid #333;
-	margin: .5rem 0;
-}
-
-button {
+button, .button {
 	cursor: pointer;
 	background: #ccc;
-}
+	padding: 7px 15px;
 
-body {
-	font-family: 'Helvetica Neue', sans-serif;
-	font-size: 16px;
-	padding: .5rem;
+	&:disabled {
+		background-color: #eaeaea;
+	}
 }
 
 #footer {
@@ -567,18 +550,6 @@ body {
 		text-decoration: none;
 		font-weight: 600;
 	}
-}
-
-[required].error {
-	border: 1px red solid;
-}
-
-[draggable] {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	user-select: none;
-	-webkit-user-drag: element;
-	cursor: move;
 }
 
 section {
@@ -644,7 +615,6 @@ section {
 
 	& > button {
 		margin-left: 1rem;
-		padding: 7px 15px;
 		font-size: 1rem;
 	}
 
@@ -677,21 +647,6 @@ section {
 			background: #eee;
 			margin-right: .5rem;
 		}
-
-		& button {
-			width: 2rem;
-			height: 2rem;
-			margin: 0 0 .5rem.5rem;
-			background: #fff;
-			font-size: 1.4rem;
-			line-height: 2rem;
-			text-align: center;
-			align-self: center;
-
-			&:before {
-				content: '+';
-			}
-		}
 	}
 }
 
@@ -722,25 +677,6 @@ section {
 	}
 }
 
-#generate {
-	flex-basis: 100%;
-	margin: 1rem;
-	text-align: center;
-
-	& .generate-button {
-		background-color: #cc0000;
-		color: #fff;
-		padding: .5rem;
-		font-size: 1.3rem;
-	}
-
-	& .generate-button:disabled {
-		cursor: default;
-		background: #eaeaea;
-		color: #ccc;
-	}
-}
-
 #log {
 	& .heading {
 		display: flex;
@@ -751,15 +687,8 @@ section {
 			left: 1rem;
 			bottom: auto;
 		}
-
-		& button {
-			padding: .5rem;
-		}
-
-		& button:disabled {
-			background-color: #eaeaea;
-		}
 	}
+
 	& .logEntries {
 		display: flex;
 		flex-direction: column-reverse;
@@ -956,12 +885,9 @@ section {
 }
 
 .upload-button {
-	background: #cccccc;
-	padding: 7px 15px;
 	margin-left: 50%;
 	transform: translateX(-50%);
 	margin-bottom: 1rem;
-	cursor: pointer;
 }
 
 input[type="file"] {
@@ -983,12 +909,6 @@ input[type="file"] {
 			margin: 0 1rem;
 			flex: 1;
 		}
-	}
-
-	& .button {
-		background: #cccccc;
-		padding: 7px 15px;
-		cursor: pointer;
 	}
 }
 
