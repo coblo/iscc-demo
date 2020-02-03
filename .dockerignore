@@ -1,0 +1,9 @@
+*
+!/.ci/nginx
+!/build
+!/resources
+!config.example.js
+!config.js
+!LICENSE
+!package.json
+!webpack.config.js

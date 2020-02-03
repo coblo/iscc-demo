@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  iscc-service:
+    image: titusz/iscc-service:0.1.2
+    restart: unless-stopped
+    ports:
+      - 8000:8080
+  iscc-demo:
+    image: iscc-service
+    build:
+      context: .
+      dockerfile: .ci/Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8080:80
