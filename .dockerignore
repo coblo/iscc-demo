@@ -1,7 +1,7 @@
 *
-!/.ci/nginx
-!/build
-!/resources
+!.ci/nginx
+!build
+!resources
 !config.example.js
 !config.js
 !LICENSE
