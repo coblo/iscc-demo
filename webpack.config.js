@@ -1,14 +1,19 @@
-var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-var CompressionPlugin = require('compression-webpack-plugin');
+const webpack = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const path = require('path');
 
-module.exports = function (env) {
+
+module.exports = (env, argv) => {
 
 	env = env || {}
+	const currentMode = argv.mode !== undefined ? argv.mode : 'development';
 
 	return [
 		{
+			mode: currentMode,
 			entry: './resources/js/main.js',
 			devServer: {
 				inline: true,
@@ -16,13 +21,27 @@ module.exports = function (env) {
 				hotOnly: true,
 				headers: {
 					"Access-Control-Allow-Origin": "*"
-				}
+				},
+				port: 8080
 			},
 			output: {
 				// maybe there's a better way to define this but I didn't experiment
 				path: __dirname,
 				filename: 'build/js/build.js', // this is what is printed in the log, so whole path here
 				publicPath: env.server ? 'http://localhost:8080/' : ''
+			},
+			stats: {
+				children: false,
+				hash: false,
+				modules: false,
+			},
+			optimization: {
+				minimizer: [
+					new TerserPlugin({
+						parallel: true,
+						cache: true,
+					})
+				]
 			},
 			module: {
 				rules: [
@@ -31,26 +50,33 @@ module.exports = function (env) {
 						use: {
 							loader: 'vue-loader',
 							options: {
-								loaders: {
-									// This is where loaders for '<script lang="...">' and '<style lang="...">' blocks are configured. We
-									// currently don't have any styles in .vue components, so the only configuration is 'js' because the
-									// default 'lang' for <script> blocks is 'js'. The default for this is 'babel-loader' without any
-									// preset by the way - a questionable choice.
-
-									// It seems only the query-string syntax is supported, so only options that can be given as a
-									// query-string can be given to loaders here. Fortunately the query-string can at least be JSON.
-									js: 'babel-loader?{presets:[["es2015", {modules: false}]], plugins:["transform-runtime"]}'
-								},
-								// There is specific support for PostCSS in vue-loader, so we don't just feed css through postcss-loader
-								postcss: [require('postcss-cssnext')()]
+								prettify: false,
+								postcss: {
+									useConfigFile: false,
+									plugins: [
+										require('postcss-preset-env')({ stage: 0 }),
+									]
+								}
 							}
 						}
 					},
 					{
 						// This is for the javascript directly in main.js (i.e. not from a .vue component)
 						test: /\.js$/,
-						use: { loader: 'babel-loader', options: { presets: [['es2015', { modules: false }]], plugins: ['transform-runtime'] } },
-						exclude: /node_modules/ // there are .js in node_modules too, but they are(?) already precompiled
+						use: {
+							loader: 'babel-loader',
+							options: {
+								presets: [
+									['@babel/env', { modules: false }],
+								],
+								plugins: [
+									'@babel/plugin-transform-runtime',
+								]
+							}
+						},
+						include: [
+							path.resolve(__dirname, 'resources'),
+						],
 					},
 					{
 						// for images used in .vue components
@@ -60,14 +86,35 @@ module.exports = function (env) {
 							options: {
 								name: 'images/[hash].[ext]', // this is what will be appended to __webpack_public_path__ set in main.js
 								outputPath: 'build/',
-								publicPath:
-								env.server ?
-								'http://localhost:8080/build/' :
-								'' // Note: this works in file-loader 0.10.1, while in file-loader 0.11.1 the outputPath is
-								// also appended. It might work again in later versions, as it is a known bug in 0.11.1.
+								publicPath: env.server ? 'http://localhost:8080/build/' : './',
+								esModule: false, // https://github.com/webpack/webpack/issues/4742
 							}
 						}
+					},
+					{
+						test: /\.css$/,
+						use: [
+							'vue-style-loader',
+							{
+								loader: 'css-loader',
+								options: {
+									importLoaders: 2,
+								}
+							},
+							{
+								loader: 'postcss-loader',
+								options: {
+									ident: 'postcss',
+									// Note that contrary to postcss-loader documentation, this has to be an array, not a function,
+									// otherwise the browserslist cache has no effect, which leads to bad performance:
+									plugins: [
+										require('postcss-preset-env')({ stage: 0 }),
+									]
+								}
+							}
+						],
 					}
+
 				]
 			},
 			resolve: {
@@ -81,26 +128,12 @@ module.exports = function (env) {
 			plugins: [
 				// always:
 
-				// Pikaday has a dependency on Moment.js (even though the documentation says otherwise) and Moment.js in turn
-				// has `require('./locale/'+name)` in its code. Webpack understands this and derives two variables from this:
-				// the "context" `.../moment/locale` and the regex `^.*$`, which means that every file from
-				// `node_modules/moment/locale` should be bundled.
-				// The following line tells Webpack: whenever you are about to bundle files from a context (directory) matching
-				// `/moment[\/\\]locale$/` don't use your derived regex but instead use the regex `/de.js$/` to find files to
-				// bundle:
-				new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /de.js$/)
-			].concat(env.live ? [
-				// only on live build:
-
-				// This performs a string replacement from `process.env.NODE_ENV` to `'production'` which will lead to
-				// conditions like `if ('production' != 'production')` for debug code, which will then be detected and removed
-				// by the minifier:
-				new webpack.DefinePlugin({
-					'process.env.NODE_ENV': JSON.stringify('production')
+				new VueLoaderPlugin(),
+				new MiniCssExtractPlugin({
+					filename: 'build/css/[name].css',
 				}),
-
-				// This does the actual minification:
-				new webpack.optimize.UglifyJsPlugin({}),
+			].concat(currentMode === 'production' ? [
+				// only on live build:
 
 				// This provides a .gz file for serving with "gzip_static on;"
 				new CompressionPlugin({}),
@@ -109,7 +142,7 @@ module.exports = function (env) {
 
 				new webpack.HotModuleReplacementPlugin()
 			] : []),
-			devtool: env.live ? false : 'cheap-module-source-map' // the only one that works: https://github.com/webpack/webpack/issues/2145#issuecomment-294361203
+			devtool: currentMode === 'production' ? false : 'cheap-module-source-map' // the only one that works: https://github.com/webpack/webpack/issues/2145#issuecomment-294361203
 		}
 	];
 };
