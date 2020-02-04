@@ -367,8 +367,12 @@ export default{
 					'Content-Type': 'multipart/form-data'
 				}
 			}).then(({body: {iscc, tophash, gmt, bits, title, extra}}) => {
-				this.file = file.name;
-				this.fileStatus = file.name;
+				let fileName = file.name.substr(0, file.name.lastIndexOf('.'));
+				if (fileName === '')
+					fileName = file.name;
+
+				this.file = fileName;
+				this.fileStatus = fileName;
 
 				let isccParts = iscc.split('-');
 				if (isccParts.length < 4)
@@ -402,7 +406,7 @@ export default{
 				this.iscc.tophash = tophash;
 				this.iscc.gmt = gmt;
 
-				this.metaData.title = title === undefined ? file.name : title;
+				this.metaData.title = title === undefined ? fileName : title;
 				this.metaData.extra = extra === undefined ? '' : extra;
 
 				if (bits.length < 4)
@@ -427,15 +431,33 @@ export default{
 
 			this.$http.post(config.apiUrl + '/generate/from_url?url=' + this.url).then(({body: {iscc, title, extra, tophash, gmt, bits}}) => {
 				let isccParts = iscc.split('-');
-				this.iscc.meta_id.code = isccParts[0];
-				this.iscc.content_id.code = isccParts[1];
-				this.iscc.data_id.code = isccParts[2];
-				this.iscc.instance_id.code = isccParts[3];
+				if (isccParts.length < 4)
+				{
+					this.iscc.content_id.code = isccParts[0];
+					this.iscc.data_id.code = isccParts[1];
+					this.iscc.instance_id.code = isccParts[2];
+				}
+				else
+				{
+					this.iscc.meta_id.code = isccParts[0];
+					this.iscc.content_id.code = isccParts[1];
+					this.iscc.data_id.code = isccParts[2];
+					this.iscc.instance_id.code = isccParts[3];
+				}
 
-				this.iscc.meta_id.bits = bits[0];
-				this.iscc.content_id.bits = bits[1];
-				this.iscc.data_id.bits = bits[2];
-				this.iscc.instance_id.bits = bits[3];
+				if (bits.length < 4)
+				{
+					this.iscc.content_id.bits = bits[0];
+					this.iscc.data_id.bits = bits[1];
+					this.iscc.instance_id.bits = bits[2];
+				}
+				else
+				{
+					this.iscc.meta_id.bits = bits[0];
+					this.iscc.content_id.bits = bits[1];
+					this.iscc.data_id.bits = bits[2];
+					this.iscc.instance_id.bits = bits[3];
+				}
 
 				this.iscc.tophash = tophash;
 				this.iscc.gmt = gmt;
@@ -443,7 +465,10 @@ export default{
 				this.metaData.title = title !== null ? title : this.url;
 				this.metaData.extra = extra !== null ? extra : '';
 
-				this.pushToLog();
+				if (bits.length < 4)
+					this.generateMetaID();
+				else
+					this.pushToLog();
 			}).catch(({body: {detail}}) => {
 				this.showError(detail[0]['msg']);
 			});
@@ -630,6 +655,8 @@ section {
 	width: 100%;
 	display: flex;
 	align-items: center;
+	overflow: hidden;
+	animation: 1s linear grow-meta;
 
 	& .meta-data-wrapper {
 		flex: 1;
@@ -723,6 +750,8 @@ section {
 			padding: 1rem;
 			background-color: #fff;
 			position: relative;
+			animation: 1s linear grow;
+			overflow-y: hidden;
 
 				& .date, & .iscc {
 					flex-basis: 100%;
@@ -1031,4 +1060,14 @@ input[type="file"] {
 		background: red;
 		color: #fff;
 	}
+
+@keyframes grow {
+	from { max-height: 0; padding: 0 1rem; }
+	to   { max-height: 200px; padding: 1rem; }
+}
+
+@keyframes grow-meta {
+	from { max-height: 0; }
+	to   { max-height: 200px; }
+}
 </style>
