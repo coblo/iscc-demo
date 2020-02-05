@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h1>ISCC Web Demo v1.0.5</h1>
-		<h2>Creating ISCC identifiers for media files</h2>
+		<h2>Creating ISCC identifiers for media files and web pages.</h2>
 		<div id="main-wrapper">
 			<div class="left">
 				<section id="input-data">
@@ -95,7 +95,7 @@
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
 							<div class="help-text">
-								Generated from the extracted plain text content without text formatting. Encodes structural content
+								Generated from the extracted content (text, image, audio or viceo). Encodes structural content
 								similarity.
 							</div>
 						</div>
@@ -105,7 +105,7 @@
 						<span>Data-ID</span>
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
-							<div class="help-text">Generated from the formated text in the editor. Encodes raw data similarity.</div>
+							<div class="help-text">Generated from the raw bitstream. Encodes raw data similarity.</div>
 						</div>
 						<div class="value">{{ iscc.data_id.code }}</div>
 					</div>
@@ -113,7 +113,7 @@
 						<span>Instance-ID</span>
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
-							<div class="help-text">Generated from the formated text in the editor. A checksum used for data integrity.</div>
+							<div class="help-text">Generated from the raw bitstream. A checksum used for data integrity.</div>
 						</div>
 						<div class="value">{{ iscc.instance_id.code }}</div>
 					</div>
@@ -129,7 +129,7 @@
 								<div class="help-text">
 									Every time you generate an ISCC a new Log entry is created for you.<br>
 									It shows the decoded raw bits of the ISCC one line per component.<br>
-									If you change the data in the the form and generate a new ISCC the Log will also show which bits are
+									If you generate a new ISCC the Log will also show which bits are
 									affected by your change of data.
 								</div>
 							</div>
