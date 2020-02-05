@@ -82,7 +82,7 @@
 
 				<section id="result">
 					<div class="heading">ISCC</div>
-					<div class="id" id="metaID">
+					<div class="id">
 						<span>Meta-ID</span>
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
@@ -90,7 +90,7 @@
 						</div>
 						<div class="value">{{ iscc.meta_id.code }}</div>
 					</div>
-					<div class="id" id="contentID">
+					<div class="id">
 						<span>Content-ID</span>
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
@@ -101,7 +101,7 @@
 						</div>
 						<div class="value">{{ iscc.content_id.code }}</div>
 					</div>
-					<div class="id" id="dataID">
+					<div class="id">
 						<span>Data-ID</span>
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
@@ -109,7 +109,7 @@
 						</div>
 						<div class="value">{{ iscc.data_id.code }}</div>
 					</div>
-					<div class="id" id="instanceID">
+					<div class="id">
 						<span>Instance-ID</span>
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
@@ -118,7 +118,59 @@
 						<div class="value">{{ iscc.instance_id.code }}</div>
 					</div>
 				</section>
+
+				<section id="matches" v-if="matchedISCCs.length > 0">
+					<div class="heading">Matches</div>
+					<div v-for="match in matchedISCCs" class="match">
+						<div class="date">
+							<span>{{ formatDate(new Date(match.time)) }}</span>
+							<span>
+								Transaction:
+								<a :href="'https://explorer.coblo.net/tx/' + match.txid">{{ match.txid }}</a>
+							</span>
+						</div>
+						<div class="title">Title: {{ match.data.title }}</div>
+						<div class="iscc">
+							{{ match.iscc }}
+						</div>
+						<div class="front">
+							<div class="row">
+								<div class="label">
+									Meta-ID
+								</div>
+								<div class="bits" :data-sim="jaccard_sim(match.diff[0])">
+										<span v-for="(bit, bitKey) in match.bits[0]" :class="{diff: !match.diff[0][bitKey]}">{{ bit }}</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="label">
+									Content-ID
+								</div>
+								<div class="bits" :data-sim="jaccard_sim(match.diff[1])">
+									<span v-for="(bit, bitKey) in match.bits[1]" :class="{diff: !match.diff[1][bitKey]}">{{ bit }}</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="label">
+									Data-ID
+								</div>
+								<div class="bits" :data-sim="jaccard_sim(match.diff[2])">
+									<span v-for="(bit, bitKey) in match.bits[2]" :class="{diff: !match.diff[2][bitKey]}">{{ bit }}</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="label">
+									Instance-ID
+								</div>
+								<div class="bits" :data-sim="jaccard_sim(match.diff[3])">
+									<span v-for="(bit, bitKey) in match.bits[3]" :class="{diff: !match.diff[3][bitKey]}">{{ bit }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
 			</div>
+
 			<div class="right">
 				<section id="log">
 					<div class="heading">
@@ -150,7 +202,7 @@
 							<div class="flipper">
 								<div class="front">
 									<div class="row">
-										<div class="label" data-id="metaID">
+										<div class="label">
 											Meta-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.meta_id">
@@ -159,7 +211,7 @@
 										</div>
 									</div>
 									<div class="row">
-										<div class="label" data-id="contentID">
+										<div class="label">
 											Content-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.content_id">
@@ -168,7 +220,7 @@
 										</div>
 									</div>
 									<div class="row">
-										<div class="label" data-id="dataID">
+										<div class="label">
 											Data-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.data_id">
@@ -177,7 +229,7 @@
 										</div>
 									</div>
 									<div class="row">
-										<div class="label" data-id="instanceID">
+										<div class="label">
 											Instance-ID
 										</div>
 										<div class="bits" :data-sim="entry.sim.instance_id">
@@ -253,6 +305,28 @@ export default{
 			url: '',
 			showMetaData: false,
 			error: '',
+			matchedISCCs: [
+				{
+					iscc: 'CCrkp1JPRqYGi-CYWv6SVUpDMhf-CDdCham5Lff3U-CR3fRNP7iR9oK',
+					bits: [
+						'0011101001010010111001000100100000110000111100101110010101101001',
+						'1010111111000010110000000011110111000000101100010011110111100110',
+						'1101011101001101001110110001111010100010111000111001010010100111',
+						'0000111111110101111010000000100110000001101100010011001010011011',
+					],
+					diff: [
+						[false,false,true,false,true,false,false,false,false,true,true,false,true,false,true,false,false,true,false,true,true,false,false,false,true,true,true,false,true,false,true,true,true,true,false,true,true,true,true,true,false,true,true,true,true,false,true,false,true,true,false,false,false,false,true,false,true,false,true,false,false,false,false,false],
+						[true,true,true,true,false,false,true,false,false,true,true,true,true,true,false,true,true,true,true,false,false,true,true,true,false,true,false,true,false,true,true,false,false,false,false,false,true,false,true,true,true,true,true,false,false,true,false,true,true,false,true,false,false,false,true,false,true,true,false,false,false,true,false,true],
+						[true,false,true,false,true,false,false,false,false,false,true,false,false,true,true,false,false,true,true,false,true,true,true,false,true,false,false,false,true,true,true,false,true,true,true,true,false,false,true,false,true,false,false,true,false,true,true,false,true,false,true,false,false,false,false,false,true,true,true,false,false,false,true,false],
+						[false,true,true,true,true,false,false,false,true,true,true,false,true,true,false,true,true,true,false,false,false,true,false,false,false,true,true,false,false,true,false,false,true,false,true,false,true,true,false,false,true,false,false,true,false,false,true,false,true,false,false,true,false,false,true,false,true,false,true,true,false,true,true,true]
+					],
+					data: {
+						title: 'Der Titel',
+					},
+					txid: 'b18c98dced109785da58d55c5f390c345e5656bfd58b7d362c5978a8a695f2cc',
+					time: 1580902124,
+				},
+			],
 		}
 	},
 	watch: {
@@ -473,6 +547,9 @@ export default{
 				this.showError(detail[0]['msg']);
 			});
 		},
+		formatDate(d) {
+			return d.getFullYear() + '-' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate() + ' ' + d.toTimeString().substring(0, 8);
+		},
 		pushToLog() {
 			this.showMetaData = true;
 
@@ -480,9 +557,6 @@ export default{
 			if (this.log.length > 0) {
 				lastBits = this.log[this.log.length - 1];
 			}
-
-			let d = new Date();
-			let timeStamp = d.getFullYear() + '-' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate() + ' ' + d.toTimeString().substring(0, 8);
 
 			let differences = false;
 			let similarity = {
@@ -509,7 +583,7 @@ export default{
 
 			this.log.push({
 				iscc: JSON.parse(JSON.stringify(this.iscc)),
-				time: timeStamp,
+				time: this.formatDate(new Date()),
 				title: this.metaData.title,
 				extra: this.metaData.extra,
 				diff: differences,
@@ -559,7 +633,6 @@ body {
 	margin: 0;
 	padding: 0;
 	border: none;
-	color: inherit;
 	font-family: roboto, sanserif, sans-serif;
 }
 
@@ -588,6 +661,10 @@ button, .button {
 
 #footer {
 	padding: 2rem 5rem;
+
+	& * {
+		color: inherit;
+	}
 
 	& span {
 		color: #3f51b5;
@@ -655,7 +732,6 @@ section {
 	width: 100%;
 	display: flex;
 	align-items: center;
-	overflow: hidden;
 	animation: 1s linear grow-meta;
 
 	& .meta-data-wrapper {
@@ -978,6 +1054,93 @@ input[type="file"] {
 	}
 }
 
+#matches {
+	& .match {
+		display: flex;
+		flex-flow: row wrap;
+		margin-top: 1rem;
+		padding: 1rem;
+		background-color: #fff;
+		position: relative;
+		animation: 1s linear grow;
+		overflow-y: hidden;
+
+		& .date, & .iscc, & .title {
+			flex-basis: 100%;
+			margin-bottom: .5rem;
+		}
+
+		& .date {
+			font-size: .7rem;
+			display: flex;
+			justify-content: space-between;
+		}
+
+		& .front {
+			width: 100%;
+			height: 6.5rem;
+			overflow-y: auto;
+		}
+
+		& .front {
+			flex-direction: column;
+
+			& .row {
+				display: flex;
+				align-items: center;
+
+				&:not(:last-of-type) {
+					margin-bottom: .5rem;
+				}
+			}
+
+			& .label {
+				width: 7rem;
+				font-size: .7rem;
+				text-align: right;
+				padding-right: .5rem;
+			}
+
+			& .bits {
+				position: relative;
+				cursor: default;
+			}
+
+			& .bits:hover:before {
+				opacity: 1;
+			}
+
+			& .bits:before {
+				content: 'Jaccard-Similarity: ' attr(data-sim) '%';
+				position: absolute;
+				left: 0;
+				top: -2px;
+				bottom: -2px;
+				width: 100%;
+				color: #000;
+				background-color: rgba(255,255,255,.5);
+				font-weight: bold;
+				text-align: center;
+				font-size: .8rem;
+				line-height: 1.2rem;
+				opacity: 0;
+			}
+
+			& span {
+				background-color: #1EB025;
+				color: rgba(255, 255, 255, 0.5);
+				font-family: "roboto mono", monospace;
+				font-size: .8rem;
+				padding: 2px 0;
+			}
+
+			& span.diff {
+				background-color: #FF0000;
+			}
+		}
+	}
+}
+
 @media (min-width: 1200px) {
 	#main-wrapper {
 		flex-direction: row;
@@ -1067,7 +1230,7 @@ input[type="file"] {
 }
 
 @keyframes grow-meta {
-	from { max-height: 0; }
-	to   { max-height: 200px; }
+	from { max-height: 0; overflow: hidden; }
+	to   { max-height: 200px; overflow: hidden; }
 }
 </style>
