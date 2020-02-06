@@ -9,7 +9,7 @@ services:
     ports:
       - 8000:8080
   iscc-demo:
-    image: iscc-service
+    image: iscc-demo
     build:
       context: .
       dockerfile: .ci/Dockerfile
