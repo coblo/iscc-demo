@@ -388,6 +388,33 @@ export default {
 		},
 		clearLog: function () {
 			if (confirm('Really clear log?')) {
+				this.fileStatus = 'missing';
+				this.file = false;
+				this.url = '';
+				this.matches = [];
+				this.metaData = {
+					title: '',
+					extra: ''
+				};
+				this.iscc = {
+					meta_id: {
+						code: '-',
+						bits: 0
+					},
+					content_id: {
+						code: '-',
+						bits: 0
+					},
+					data_id: {
+						code: '-',
+						bits: 0
+					},
+					instance_id: {
+						code: '-',
+						bits: 0
+					}
+				};
+				this.showMetaData = false;
 				this.log = [];
 			}
 		},
