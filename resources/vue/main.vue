@@ -29,7 +29,7 @@
 						<div v-else-if="fileStatus === 'generating'">
 							Generating ISCC...
 						</div>
-						<div v-else class="file">{{ file }}</div>
+						<div v-else class="file">{{ fileStatus }}</div>
 					</div>
 
 					<label v-if="generateFrom === 'file'" class="upload-button button">
@@ -251,8 +251,8 @@
 								<div class="back">
 									<div class="title">Title: {{ entry.title }}</div>
 									<div v-if="entry.extra" class="title">Extra: {{ entry.extra }}</div>
-									<div v-if="entry.file !== null">File: {{ file }}</div>
-									<div v-if="entry.url !== null">URL: {{ url }}</div>
+									<div v-if="entry.file !== null">File: {{ entry.file }}</div>
+									<div v-if="entry.url !== null">URL: {{ entry.url }}</div>
 									<div>Tophash: {{ entry.iscc.tophash }}</div>
 									<div>GMT: {{ entry.iscc.gmt }}</div>
 								</div>
@@ -309,8 +309,8 @@ export default{
 			log: [],
 			entryDataChanged: false,
 			localFileDragged: false,
-			file: false,
 			fileStatus: 'missing',
+			file: false,
 			generateFrom: 'file',
 			url: '',
 			showMetaData: false,
@@ -320,8 +320,8 @@ export default{
 	},
 	watch: {
 		generateFrom(val) {
-			this.file = false;
 			this.fileStatus = 'missing';
+			this.file = false;
 			this.url = '';
 			this.matches = [];
 			this.metaData = {
@@ -434,8 +434,8 @@ export default{
 				if (fileName === '')
 					fileName = file.name;
 
-				this.file = fileName;
 				this.fileStatus = fileName;
+				this.file = file.name;
 
 				let isccParts = iscc.split('-');
 				if (isccParts.length < 4)
