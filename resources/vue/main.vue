@@ -119,9 +119,15 @@
 					</div>
 				</section>
 
-				<section id="matches" v-if="matchedISCCs.length > 0">
-					<div class="heading">Matches</div>
-					<div v-for="match in matchedISCCs" class="match">
+				<section id="matches" v-if="matches.length > 0">
+					<div class="heading">
+						Matches
+						<div class="help-wrapper">
+							<img class="help-icon" src="../images/question.svg">
+							<div class="help-text">Matches from the content blockchain.</div>
+						</div>
+					</div>
+					<div v-for="match in matches" class="match">
 						<div class="date">
 							<span>{{ formatDate(new Date(match.time)) }}</span>
 							<span>
@@ -129,7 +135,6 @@
 								<a :href="'https://explorer.coblo.net/tx/' + match.txid">{{ match.txid }}</a>
 							</span>
 						</div>
-						<div class="title">Title: {{ match.data.title }}</div>
 						<div class="iscc">
 							{{ match.iscc }}
 						</div>
@@ -166,6 +171,11 @@
 									<span v-for="(bit, bitKey) in match.bits[3]" :class="{diff: !match.diff[3][bitKey]}">{{ bit }}</span>
 								</div>
 							</div>
+						</div>
+						<div class="title">
+							<span>Title:</span>
+							<a v-if="match.content_url !== undefined" :href="match.content_url">{{ match.title }}</a>
+							<span v-else>{{ match.title }}</span>
 						</div>
 					</div>
 				</section>
@@ -305,28 +315,7 @@ export default{
 			url: '',
 			showMetaData: false,
 			error: '',
-			matchedISCCs: [
-				{
-					iscc: 'CCrkp1JPRqYGi-CYWv6SVUpDMhf-CDdCham5Lff3U-CR3fRNP7iR9oK',
-					bits: [
-						'0011101001010010111001000100100000110000111100101110010101101001',
-						'1010111111000010110000000011110111000000101100010011110111100110',
-						'1101011101001101001110110001111010100010111000111001010010100111',
-						'0000111111110101111010000000100110000001101100010011001010011011',
-					],
-					diff: [
-						[false,false,true,false,true,false,false,false,false,true,true,false,true,false,true,false,false,true,false,true,true,false,false,false,true,true,true,false,true,false,true,true,true,true,false,true,true,true,true,true,false,true,true,true,true,false,true,false,true,true,false,false,false,false,true,false,true,false,true,false,false,false,false,false],
-						[true,true,true,true,false,false,true,false,false,true,true,true,true,true,false,true,true,true,true,false,false,true,true,true,false,true,false,true,false,true,true,false,false,false,false,false,true,false,true,true,true,true,true,false,false,true,false,true,true,false,true,false,false,false,true,false,true,true,false,false,false,true,false,true],
-						[true,false,true,false,true,false,false,false,false,false,true,false,false,true,true,false,false,true,true,false,true,true,true,false,true,false,false,false,true,true,true,false,true,true,true,true,false,false,true,false,true,false,false,true,false,true,true,false,true,false,true,false,false,false,false,false,true,true,true,false,false,false,true,false],
-						[false,true,true,true,true,false,false,false,true,true,true,false,true,true,false,true,true,true,false,false,false,true,false,false,false,true,true,false,false,true,false,false,true,false,true,false,true,true,false,false,true,false,false,true,false,false,true,false,true,false,false,true,false,false,true,false,true,false,true,true,false,true,true,true]
-					],
-					data: {
-						title: 'Der Titel',
-					},
-					txid: 'b18c98dced109785da58d55c5f390c345e5656bfd58b7d362c5978a8a695f2cc',
-					time: 1580902124,
-				},
-			],
+			matches: [],
 		}
 	},
 	watch: {
@@ -334,6 +323,7 @@ export default{
 			this.file = false;
 			this.fileStatus = 'missing';
 			this.url = '';
+			this.matches = [];
 			this.metaData = {
 				title: '',
 				extra: ''
@@ -436,7 +426,6 @@ export default{
 			formData.append('file', file);
 
 			this.$http.post(config.apiUrl + '/generate/from_file', formData, {
-				emulateJSON: true,
 				headers: {
 					'Content-Type': 'multipart/form-data'
 				}
@@ -551,6 +540,32 @@ export default{
 			return d.getFullYear() + '-' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate() + ' ' + d.toTimeString().substring(0, 8);
 		},
 		pushToLog() {
+			this.matches = [];
+			let isccString = [this.iscc.meta_id.code, this.iscc.content_id.code, this.iscc.data_id.code, this.iscc.instance_id.code].join('-');
+			this.$http.get(config.apiUrl + '/lookup?iscc=' + isccString, {
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}).then(({body: matches}) => {
+				for (let match of matches)
+				{
+					this.matches.push({
+						iscc: match.keys.join('-'),
+						bits: match.bits,
+						diff: [
+							this.diffArray(this.iscc.meta_id.bits, match.bits[0]),
+							this.diffArray(this.iscc.content_id.bits, match.bits[1]),
+							this.diffArray(this.iscc.data_id.bits, match.bits[2]),
+							this.diffArray(this.iscc.instance_id.bits, match.bits[3]),
+						],
+						title: match.title,
+						txid: match.txid,
+						content_url: match.content_url,
+						time: match.time,
+						})
+				}
+			});
+
 			this.showMetaData = true;
 
 			let lastBits = false;
@@ -1065,7 +1080,7 @@ input[type="file"] {
 		animation: 1s linear grow;
 		overflow-y: hidden;
 
-		& .date, & .iscc, & .title {
+		& .date, & .iscc {
 			flex-basis: 100%;
 			margin-bottom: .5rem;
 		}
@@ -1136,6 +1151,18 @@ input[type="file"] {
 
 			& span.diff {
 				background-color: #FF0000;
+			}
+		}
+
+		& .title {
+			font-size: .8rem;
+			display: flex;
+			width: 100%;
+			margin-top: 10px;
+
+			& :first-child {
+				white-space: nowrap;
+				margin-right: 5px;
 			}
 		}
 	}
