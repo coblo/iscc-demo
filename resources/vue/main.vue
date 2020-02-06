@@ -274,13 +274,20 @@
 			<a href="https://rightsprofiledemo.content-blockchain.org/" target="_blank">Rights Profile Demo</a> |
 			<a href="https://github.com/coblo/iscc-demo" target="_blank">Source Code</a> | Copyright © 2017 - 2020 <a href="https://content-blockchain.org/" target="_blank">CBP</a>
 		</div>
-	</div>
 
+		<div v-if="spinner" class="spinner-bg">
+			<spinner />
+		</div>
+	</div>
 </template>
 <script>
 import config from '../../config.js'
+import Spinner from './spinner.vue';
 
-export default{
+export default {
+	components: {
+		Spinner,
+	},
 	data: function() {
 		return {
 			iscc: {
@@ -316,6 +323,7 @@ export default{
 			showMetaData: false,
 			error: '',
 			matches: [],
+			spinner: false,
 		}
 	},
 	watch: {
@@ -351,6 +359,7 @@ export default{
 	},
 	methods: {
 		generateMetaID() {
+			this.spinner = true;
 			this.$http.post(config.apiUrl + '/generate/meta_id/', {
 				title: this.metaData.title,
 				extra: (this.metaData.extra ? this.metaData.extra : ' '),
@@ -361,6 +370,7 @@ export default{
 				this.pushToLog();
 			}).catch(({body: {detail}}) => {
 				this.showError(detail[0]['msg']);
+				this.spinner = false;
 			});
 		},
 		diffArray: function(arr1, arr2) {
@@ -421,6 +431,7 @@ export default{
 		},
 		generateISCCFromFile(file) {
 			this.fileStatus = 'generating';
+			this.spinner = true;
 
 			let formData = new FormData();
 			formData.append('file', file);
@@ -483,6 +494,7 @@ export default{
 					this.showError(detail);
 
 				this.fileStatus = 'missing';
+				this.spinner = false;
 			});
 		},
 		generateISCCFromUrl() {
@@ -492,6 +504,7 @@ export default{
 				return;
 			}
 
+			this.spinner = true;
 			this.$http.post(config.apiUrl + '/generate/from_url?url=' + this.url).then(({body: {iscc, title, extra, tophash, gmt, bits}}) => {
 				let isccParts = iscc.split('-');
 				if (isccParts.length < 4)
@@ -534,6 +547,7 @@ export default{
 					this.pushToLog();
 			}).catch(({body: {detail}}) => {
 				this.showError(detail[0]['msg']);
+				this.spinner = false;
 			});
 		},
 		formatDate(d) {
@@ -562,8 +576,11 @@ export default{
 						txid: match.txid,
 						content_url: match.content_url,
 						time: match.time,
-						})
+						});
 				}
+				this.spinner = false;
+			}).catch((e) => {
+				this.spinner = false;
 			});
 
 			this.showMetaData = true;
@@ -1166,6 +1183,15 @@ input[type="file"] {
 			}
 		}
 	}
+}
+
+.spinner-bg {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(119, 119, 119, 0.5);
+	margin-left: -.5rem;
+	margin-top: -.5rem;
 }
 
 @media (min-width: 1200px) {
