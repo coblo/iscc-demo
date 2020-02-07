@@ -132,7 +132,7 @@
 							<span>{{ formatDate(new Date(match.time)) }}</span>
 							<span>
 								Transaction:
-								<a :href="'https://explorer.coblo.net/tx/' + match.txid">{{ match.txid }}</a>
+								<a :href="'https://explorer.coblo.net/stream/iscc/' + match.txid + ':' + match.vout">{{ match.txid }}</a>
 							</span>
 						</div>
 						<div class="iscc">
@@ -574,6 +574,7 @@ export default {
 						],
 						title: match.title,
 						txid: match.txid,
+						vout: match.vout,
 						content_url: match.content_url,
 						time: match.time,
 						});
