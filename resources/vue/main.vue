@@ -86,7 +86,7 @@
 						<span>Meta-ID</span>
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
-							<div class="help-text">Generated from Title and extra fields. Encodes similarity of Metadata.</div>
+							<div class="help-text">Generated from title and extra fields. Encodes similarity of metadata.</div>
 						</div>
 						<div class="value">{{ iscc.meta_id.code }}</div>
 					</div>
@@ -95,7 +95,7 @@
 						<div class="help-wrapper">
 							<img class="help-icon" src="../images/question.svg">
 							<div class="help-text">
-								Generated from the extracted content (text, image, audio or viceo). Encodes structural content
+								Generated from the extracted content (text, image, audio or video). Encodes structural content
 								similarity.
 							</div>
 						</div>
