@@ -2,7 +2,7 @@ version: '3'
 
 services:
   iscc-service:
-    image: titusz/iscc-service:0.2.1
+    image: titusz/iscc-service:0.2.3
     restart: unless-stopped
     env_file:
       - iscc-service.env
